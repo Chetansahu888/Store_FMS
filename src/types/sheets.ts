@@ -229,13 +229,16 @@ export type IssueSheet = {
     timestamp: string;
     issueNo: string;  // Changed from issueNumber to match "Issue No" -> issueNo
     issueTo: string;  // Maps to "Issue to" column
+    uom: string;
+    groupHead: string;
     productName: string;
     quantity: number;
     department: string;  // Maps to "Store Status" column  
+
+
     planned1?: string;
     actual1?: string;
     timeDelay1?: string;
-    uom: string;
     status: string;
     givenQty?: number;    // Changed from givenQuantity to match "Given Qty" -> givenQty
 

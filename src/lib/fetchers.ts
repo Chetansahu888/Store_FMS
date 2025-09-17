@@ -86,6 +86,9 @@ export async function fetchSheet(
             }
         }
 
+
+        // console.log("vendore",vendors);
+
         return {
             vendors,
             departments: [...departments],

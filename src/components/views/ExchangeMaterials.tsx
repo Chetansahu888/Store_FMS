@@ -248,7 +248,7 @@ useEffect(() => {
                   },
               ]
             : []),
-        { accessorKey: 'timestamp', header: 'Timestamp' },
+        // { accessorKey: 'timestamp', header: 'Timestamp' },
         { accessorKey: 'liftNumber', header: 'Lift Number' },
         { accessorKey: 'indentNo', header: 'Indent No.' },
         { accessorKey: 'poNumber', header: 'PO Number' },
@@ -326,7 +326,7 @@ useEffect(() => {
     ];
 
     const historyColumns: ColumnDef<ExchangeHistoryData>[] = [
-        { accessorKey: 'timestamp', header: 'Timestamp' },
+        // { accessorKey: 'timestamp', header: 'Timestamp' },
         { accessorKey: 'liftNumber', header: 'Lift Number' },
         { accessorKey: 'indentNo', header: 'Indent No.' },
         { accessorKey: 'poNumber', header: 'PO Number' },

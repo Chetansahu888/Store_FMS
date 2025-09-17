@@ -100,7 +100,7 @@ export default () => {
 
             const nextIssueNumber = getNextIssueNumber(issueSheet || []);
 
-            console.log('nextIssueNumber', nextIssueNumber);
+            // console.log('nextIssueNumber', nextIssueNumber);
 
             const rows: Partial<IssueSheet>[] = [];
             for (const product of data.products) {
@@ -108,10 +108,11 @@ export default () => {
                     timestamp: new Date().toISOString(),
                     issueNo: nextIssueNumber, // Changed from issueNumber to issueNo
                     issueTo: product.specifications || '', // Map specifications to issueTo
+                    uom: product.uom,
+                    groupHead:product.groupHead,
                     productName: product.productName,
                     quantity: product.quantity,
                     department: product.department, // Map department to storeStatus
-                    uom: product.uom,
                 };
 
                 rows.push(row);
