@@ -279,6 +279,8 @@ export type StoreInSheet = {
     quantityAsPerBill: number;
     priceAsPerPo: number;
     remark: string;
+
+
     planned7: string;
     actual7: string;
     timeDelay7: string;
@@ -289,12 +291,27 @@ export type StoreInSheet = {
     actual8: string;
     delay8: string;
     statusPurchaser: string;
+
+
     planned9: string;
     actual9: string;
     timeDelay9: string;
     debitNoteCopy: string;
     billCopy: string;
     returnCopy: string;
+
+     planned10: string;
+    actual10: string;
+    timeDelay10: string;
+    warrenty:string;
+    billReceived:string;
+    billAmount2:string;
+    billImage:string;
+    exchangeQty:string;
+    billNumber2:string;
+    
+
+
 
 
     poDate: string;
