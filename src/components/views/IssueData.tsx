@@ -40,6 +40,7 @@ interface ApproveTableData {
     productName: string;
     quantity: number;
     department: string;
+    groupHead:string;
 }
 
 interface HistoryData {
@@ -51,6 +52,7 @@ interface HistoryData {
     department: string;
     status: string;
     givenQty: number;
+    groupHead:string;
 }
 
 export default () => {
@@ -76,6 +78,7 @@ export default () => {
                     productName: sheet.productName,
                     quantity: sheet.quantity,
                     department: sheet.department,
+                    groupHead: sheet.groupHead,
                 }))
         );
     }, [issueSheet]);
@@ -93,6 +96,7 @@ export default () => {
                     department: sheet.department,
                     status: sheet.status || '', // Add this
                     givenQty: sheet.givenQty || 0, // Add this
+                    groupHead: sheet.groupHead,
                 }))
         );
     }, [issueSheet]);
@@ -136,47 +140,7 @@ export default () => {
         }
     };
 
-    // const handleEditClick = (row: HistoryData) => {
-    //     setEditingRow(row.indentNo);
-    //     setEditValues({
-    //         approvedQuantity: row.approvedQuantity,
-    //         uom: row.uom,
-    //         vendorType: row.vendorType,
-    //     });
-    // };
-
-    // const handleCancelEdit = () => {
-    //     setEditingRow(null);
-    //     setEditValues({});
-    // };
-
-    // const handleSaveEdit = async (indentNo: string) => {
-    //     try {
-    //         await postToSheet(
-    //             issueSheet
-    //                 .filter((s) => s.issueNo === indentNo)
-    //                 .map((prev) => ({
-    //                     ...prev,
-    //                     approvedQuantity: editValues.approvedQuantity,
-    //                     uom: editValues.uom,
-    //                     vendorType: editValues.vendorType,
-    //                     lastUpdated: new Date().toISOString(),
-    //                 })),
-    //             'update'
-    //         );
-    //         toast.success(`Updated indent ${indentNo}`);
-    //         updateIndentSheet();
-    //         setEditingRow(null);
-    //         setEditValues({});
-    //     } catch {
-    //         toast.error('Failed to update indent');
-    //     }
-    // };
-
-    // const handleInputChange = (field: keyof HistoryData, value: any) => {
-    //     setEditValues(prev => ({ ...prev, [field]: value }));
-    // };
-
+    
     // Creating table columns
 
     const columns: ColumnDef<ApproveTableData>[] = [
@@ -207,6 +171,7 @@ export default () => {
             : []),
         { accessorKey: 'issueNo', header: 'Issue No' },
         { accessorKey: 'issueTo', header: 'Issue to' },
+        { accessorKey: 'groupHead', header: 'Group Head' },
         { accessorKey: 'uom', header: 'Uom' },
         { accessorKey: 'productName', header: 'Product Name' },
         { accessorKey: 'quantity', header: 'Quantity' },
@@ -216,6 +181,7 @@ export default () => {
     const historyColumns: ColumnDef<HistoryData>[] = [
         { accessorKey: 'issueNo', header: 'Issue No' },
         { accessorKey: 'issueTo', header: 'Issue to' },
+        { accessorKey: 'groupHead', header: 'Group Head' },
         { accessorKey: 'uom', header: 'Uom' },
         { accessorKey: 'productName', header: 'Product Name' },
         { accessorKey: 'quantity', header: 'Quantity' },

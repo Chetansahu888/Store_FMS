@@ -156,63 +156,7 @@ export default () => {
             </Heading>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit, onError)} className="space-y-6 p-5">
-                    {/* <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        <FormField
-                            control={form.control}
-                            name="indenterName"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        Indenter Name
-                                        <span className="text-destructive">*</span>
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter indenter name" {...field} />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
 
-                        <FormField
-                            control={form.control}
-                            name="indentType"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        Indent Type
-                                        <span className="text-destructive">*</span>
-                                    </FormLabel>
-                                    <Select onValueChange={field.onChange} value={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Select type" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            <SelectItem value="Purchase">Purchase</SelectItem>
-                                            <SelectItem value="Store Out">Store Out</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField
-                            control={form.control}
-                            name="indentApproveBy"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        Approved By
-                                        <span className="text-destructive">*</span>
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Enter approved by" {...field} />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
-                    </div> */}
 
                     <div className="space-y-4">
                         {fields.map((field, index) => {
@@ -292,29 +236,7 @@ export default () => {
                                                 )}
                                             />
 
-                                            {/* {products[index]?.department && (
-                                                <FormField
-                                                    control={form.control}
-                                                    name={`products.${index}.givenQuantity`}
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel>
-                                                                Given Quantity
-                                                                <span className="text-destructive">
-                                                                    *
-                                                                </span>
-                                                            </FormLabel>
-                                                            <FormControl>
-                                                                <Input
-                                                                    type="number"
-                                                                    placeholder="Enter given quantity"
-                                                                    {...field}
-                                                                />
-                                                            </FormControl>
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            )} */}
+                                        
                                             <FormField
                                                 control={form.control}
                                                 name={`products.${index}.groupHead`}
