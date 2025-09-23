@@ -78,6 +78,7 @@ export type IndentSheet = {
     totalQty:number;
     receivedQty:number;
     rowIndex: string;
+    issueStatus:string;
 
 
 };
