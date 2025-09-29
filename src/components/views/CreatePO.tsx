@@ -36,7 +36,7 @@ function generatePoNumber(poNumbers: string[], today = new Date()): string {
         .toString()
         .padStart(2, '0')}`;
 
-    const prefix = `JJSPL/STORES/${fy}/`;
+    const prefix = `STORE/PO/${fy}/`;
 
     // Step 2: Extract numbers for curre nt financial year
     const numbersInFY = poNumbers
