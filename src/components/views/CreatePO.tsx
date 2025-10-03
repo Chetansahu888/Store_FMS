@@ -464,6 +464,7 @@ export default () => {
                 terms: values.terms,
                 // preparedBy: values.preparedBy,
                 // approvedBy: values.approvedBy,
+                
             };
 
             const blob = await pdf(<POPdf {...pdfProps} />).toBlob();

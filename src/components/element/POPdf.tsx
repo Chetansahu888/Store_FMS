@@ -231,8 +231,8 @@ export interface POPdfProps {
     gstAmount: number;
     grandTotal: number;
     terms: string[];
-    preparedBy: string;
-    approvedBy: string;
+    // preparedBy: string;
+    // approvedBy: string;
 }
 
 export default ({
@@ -258,8 +258,8 @@ export default ({
     gstAmount,
     grandTotal,
     terms,
-    preparedBy,
-    approvedBy,
+    // preparedBy,
+    // approvedBy,
 }: POPdfProps) => {
     return (
         <Document>
@@ -437,11 +437,11 @@ export default ({
                     <View style={styles.signatureContainer}>
                         <View style={styles.signatureSection}>
                             <Text style={styles.signatureLabel}>Prepared By</Text>
-                            <Text>{preparedBy}</Text>
+                            {/* <Text>{preparedBy}</Text> */}
                         </View>
                         <View style={styles.signatureSection}>
                             <Text style={styles.signatureLabel}>Approved By</Text>
-                            <Text>{approvedBy}</Text>
+                            {/* <Text>{approvedBy}</Text> */}
                         </View>
                         <Text style={styles.companySignature}>For {companyName}</Text>
                     </View>
