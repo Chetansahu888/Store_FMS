@@ -1,4 +1,4 @@
-export type Sheet = 'INDENT' | 'RECEIVED' | 'MASTER' | 'USER' | 'PO MASTER' | "INVENTORY" | "ISSUE" | "STORE IN" | "TALLY ENTRY" | "PC REPORT" |"Fullkitting";
+export type Sheet = 'INDENT' | 'RECEIVED' | 'MASTER' | 'USER' | 'PO MASTER' | "INVENTORY" | "ISSUE" | "STORE IN" | "TALLY ENTRY" | "PC REPORT" | "Fullkitting";
 
 export type IndentSheet = {
     issuedStatus: any;
@@ -74,11 +74,14 @@ export type IndentSheet = {
     noDay: number;
     pendingPoQty: number;
     status: string;
-    poQty:string;
-    totalQty:number;
-    receivedQty:number;
+    poQty: string;
+    totalQty: number;
+    receivedQty: number;
     rowIndex: string;
-    issueStatus:string;
+    issueStatus: string;
+    liftingStatus: string;
+    // pendingLiftQty: number;
+    pendingLiftQty: number
 
 
 };
@@ -143,8 +146,8 @@ export type PoMasterSheet = {
     discount: number;
     amount: number;
     totalPoAmount: number;
-    preparedBy: string;
-    approvedBy: string;
+    // preparedBy: string;
+    // approvedBy: string;
     pdf: string;
     quotationNumber: string;
     quotationDate: string;
@@ -160,8 +163,8 @@ export type PoMasterSheet = {
     term8: string;
     term9: string;
     term10: string;
-    deliveryDays: number; 
-    deliveryType: string; 
+    deliveryDays: number;
+    deliveryType: string;
 
 };
 
@@ -343,8 +346,14 @@ export type StoreInSheet = {
     planned11: string;
     actual11: string;
     billStatusNew: string;
-    
+
     materialStatus: string;
+
+    vehicleNo: string;
+    driverName: string;
+    driverMobileNo: string;
+
+    
 }
 
 
@@ -352,8 +361,11 @@ export type StoreInSheet = {
 export type TallyEntrySheet = {
     timestamp: string;
     indentNo: string;
-    indentDate: string;
     purchaseDate: string;
+    indentDate: string;
+    indentNumber: string;
+    liftNumber: string;
+    poNumber: string;
     materialInDate: string;
     productName: string;
     billNo: string;
@@ -416,6 +428,9 @@ export type FullkittingSheet = {
     transportingInclude: string;
     transporterName: string;
     amount: number;
+    vehicleNo: string;
+    driverName: string;
+    driverMobileNo: string;
     planned: string;
     actual: string;
     timeDelay: string;

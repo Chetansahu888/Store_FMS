@@ -91,6 +91,11 @@ export default () => {
                 transportationInclude: i.transportationInclude || '',
                 transporterName: i.transporterName || '',
                 amount: i.amount || 0,
+
+                damageOrder: i.damageOrder || '',
+    quantityAsPerBill: i.quantityAsPerBill || 0,
+    priceAsPerPo: i.priceAsPerPo || 0,
+    remark: i.remark || '',
             }))
     );
 }, [storeInSheet]);
@@ -115,6 +120,11 @@ export default () => {
                 status: i.status || '',
                 reason: i.reason || '',
                 billNumber: i.billNo || '',
+
+                damageOrder: i.damageOrder || '',
+    quantityAsPerBill: i.quantityAsPerBill || 0,
+    priceAsPerPo: i.priceAsPerPo || 0,
+    remark: i.remark || '',
             }))
     );
 }, [storeInSheet]);
@@ -170,6 +180,12 @@ export default () => {
         { accessorKey: 'transportationInclude', header: 'Transportation Include' },
         { accessorKey: 'transporterName', header: 'Transporter Name' },
         { accessorKey: 'amount', header: 'Amount' },
+
+        { accessorKey: 'damageOrder', header: 'Damage Order' },
+{ accessorKey: 'quantityAsPerBill', header: 'Quantity As Per Bill' },
+{ accessorKey: 'priceAsPerPo', header: 'Price As Per Po' },
+{ accessorKey: 'remark', header: 'Remark' },
+
     ];
 
     const historyColumns: ColumnDef<StoreInHistoryData>[] = [
@@ -203,12 +219,20 @@ export default () => {
             header: 'Status',
             cell: ({ row }) => {
                 const status = row.original.status;
-                const variant = status === 'Return' ? 'secondary' : 'reject';
+                const variant = status === 'Return' ? 'secondary' 
+                      : status === 'Exchange' ? 'default'  // ✅ Ye add karein
+                      : 'reject';
                 return <Pill variant={variant}>{status}</Pill>;
             },
         },
         { accessorKey: 'reason', header: 'Reason' },
         { accessorKey: 'billNumber', header: 'Bill Number' },
+
+        { accessorKey: 'damageOrder', header: 'Damage Order' },
+{ accessorKey: 'quantityAsPerBill', header: 'Quantity As Per Bill' },
+{ accessorKey: 'priceAsPerPo', header: 'Price As Per Po' },
+{ accessorKey: 'remark', header: 'Remark' },
+
     ];
 
     const schema = z.object({
@@ -417,9 +441,9 @@ export default () => {
                                                             <SelectItem value="Not Return">
                                                                 Not Return
                                                             </SelectItem>
-                                                            {/* <SelectItem value="Exchange">
+                                                            <SelectItem value="Exchange">
                                                                 Exchange
-                                                            </SelectItem> */}
+                                                            </SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                 </FormControl>

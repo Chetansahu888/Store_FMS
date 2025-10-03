@@ -57,6 +57,9 @@ interface HistoryData {
     photoOfBill: string;
     transportationInclude: string;
     transporterName: string;
+    vehicleNo: string;
+    driverName: string;
+    driverMobileNo: string;
     amount: number;
 }
 
@@ -77,72 +80,114 @@ export default () => {
         // Pending: planned7 is not null and actual7 is null
         setTableData(
             indentSheet
-                .filter((sheet) => sheet.planned5 !== '' && sheet.actual5 == '')
+                .filter((sheet) => sheet.liftingStatus === 'Pending')
                 .map((sheet) => ({
                     indentNo: sheet.indentNumber,
                     indenter: sheet.indenterName,
                     department: sheet.department,
                     product: sheet.productName,
-                    quantity: sheet.approvedQuantity,
+                    quantity: sheet.pendingLiftQty,
                     uom: sheet.uom,
                     poNumber: sheet.poNumber,
                 }))
         );
     }, [indentSheet]);
 
-useEffect(() => {
-    setHistoryData(
-        storeInSheet
-            .map((sheet) => ({
-                liftNumber: sheet.liftNumber || '',
-                indentNo: sheet.indentNo || '',
-                poNumber: sheet.poNumber || '',
-                vendorName: sheet.vendorName || '',
-                productName: sheet.productName || '',
-                billStatus: sheet.billStatus || '',
-                billNo: sheet.billNo || '',
-                qty: sheet.qty || 0,
-                leadTime: sheet.leadTimeToLiftMaterial || 0,
-                typeOfBill: sheet.typeOfBill || '',
-                billAmount: sheet.billAmount || 0,
-                discountAmount: sheet.discountAmount || 0,
-                paymentType: sheet.paymentType || '',
-                advanceAmount: Number(sheet.advanceAmountIfAny) || 0, // FIX HERE
-                photoOfBill: sheet.photoOfBill || '',
-                transportationInclude: sheet.transportationInclude || '',
-                transporterName: sheet.transporterName || '',
-                amount: sheet.amount || 0,
-            }))
-            .sort((a, b) => b.indentNo.localeCompare(a.indentNo))
-    );
-}, [storeInSheet]);
+
+    // useEffect(() => {
+    //     setHistoryData(
+    //         storeInSheet
+    //             .map((sheet) => ({
+    //                 liftNumber: sheet.liftNumber || '',
+    //                 indentNo: sheet.indentNo || '',
+    //                 poNumber: sheet.poNumber || '',
+    //                 vendorName: sheet.vendorName || '',
+    //                 productName: sheet.productName || '',
+    //                 billStatus: sheet.billStatus || '',
+    //                 billNo: sheet.billNo || '',
+    //                 qty: sheet.qty || 0,
+    //                 leadTime: sheet.leadTimeToLiftMaterial || 0,
+    //                 typeOfBill: sheet.typeOfBill || '',
+    //                 billAmount: sheet.billAmount || 0,
+    //                 discountAmount: sheet.discountAmount || 0,
+    //                 paymentType: sheet.paymentType || '',
+    //                 advanceAmount: Number(sheet.advanceAmountIfAny) || 0, // FIX HERE
+    //                 photoOfBill: sheet.photoOfBill || '',
+    //                 transportationInclude: sheet.transportationInclude || '',
+    //                 transporterName: sheet.transporterName || '',
+    //                 vehicleNo: sheet.vehicleNo || '',
+    //                 driverName: sheet.driverName || '',
+    //                 driverMobileNo: sheet.driverMobileNo || '',
+    //                 amount: sheet.amount || 0,
+    //             }))
+    //             .sort((a, b) => b.indentNo.localeCompare(a.indentNo))
+    //     );
+    // }, [storeInSheet]);
+
+    // History data ko filter karo based on indent sheet ki lifting status
+    useEffect(() => {
+        // Pehle wo indent numbers nikaalo jinki lifting status complete hai
+        const completedIndentNumbers = indentSheet
+            .filter(sheet => sheet.liftingStatus === 'Complete')
+            .map(sheet => sheet.indentNumber);
+
+        // Ab storeInSheet se sirf wahi data dikhao jo completed indents se match kare
+        setHistoryData(
+            storeInSheet
+                .filter(sheet => completedIndentNumbers.includes(sheet.indentNo))
+                .map((sheet) => ({
+                    liftNumber: sheet.liftNumber || '',
+                    indentNo: sheet.indentNo || '',
+                    poNumber: sheet.poNumber || '',
+                    vendorName: sheet.vendorName || '',
+                    productName: sheet.productName || '',
+                    billStatus: sheet.billStatus || '',
+                    billNo: sheet.billNo || '',
+                    qty: sheet.qty || 0,
+                    leadTime: sheet.leadTimeToLiftMaterial || 0,
+                    typeOfBill: sheet.typeOfBill || '',
+                    billAmount: sheet.billAmount || 0,
+                    discountAmount: sheet.discountAmount || 0,
+                    paymentType: sheet.paymentType || '',
+                    advanceAmount: Number(sheet.advanceAmountIfAny) || 0,
+                    photoOfBill: sheet.photoOfBill || '',
+                    transportationInclude: sheet.transportationInclude || '',
+                    transporterName: sheet.transporterName || '',
+                    vehicleNo: sheet.vehicleNo || '',
+                    driverName: sheet.driverName || '',
+                    driverMobileNo: sheet.driverMobileNo || '',
+                    amount: sheet.amount || 0,
+                }))
+                .sort((a, b) => b.indentNo.localeCompare(a.indentNo))
+        );
+    }, [storeInSheet, indentSheet]); // indentSheet bhi dependency mein add karo
 
     // Creating table columns
     const columns: ColumnDef<GetPurchaseData>[] = [
         ...(user.receiveItemAction
             ? [
-                  {
-                      header: 'Action',
-                      cell: ({ row }: { row: Row<GetPurchaseData> }) => {
-                          const indent = row.original;
+                {
+                    header: 'Action',
+                    cell: ({ row }: { row: Row<GetPurchaseData> }) => {
+                        const indent = row.original;
 
-                          return (
-                              <div>
-                                  <DialogTrigger asChild>
-                                      <Button
-                                          variant="outline"
-                                          onClick={() => {
-                                              setSelectedIndent(indent);
-                                          }}
-                                      >
-                                          Update
-                                      </Button>
-                                  </DialogTrigger>
-                              </div>
-                          );
-                      },
-                  },
-              ]
+                        return (
+                            <div>
+                                <DialogTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            setSelectedIndent(indent);
+                                        }}
+                                    >
+                                        Update
+                                    </Button>
+                                </DialogTrigger>
+                            </div>
+                        );
+                    },
+                },
+            ]
             : []),
         {
             accessorKey: 'indentNo',
@@ -208,6 +253,9 @@ useEffect(() => {
         },
         { accessorKey: 'transportationInclude', header: 'Transportation Include' },
         { accessorKey: 'transporterName', header: 'Transporter Name' },
+        { accessorKey: 'vehicleNo', header: 'Vehicle No.' },
+        { accessorKey: 'driverName', header: 'Driver Name' },
+        { accessorKey: 'driverMobileNo', header: 'Driver Mobile No.' },
         { accessorKey: 'amount', header: 'Amount' },
     ];
 
@@ -227,6 +275,9 @@ useEffect(() => {
         vendorName: z.string().optional(),
         transportationInclude: z.string().optional(),
         transporterName: z.string().optional(),
+        vehicleNo: z.string().optional(),
+        driverName: z.string().optional(),
+        driverMobileNo: z.string().optional(),
         amount: z.coerce.number().optional(),
     });
 
@@ -246,6 +297,9 @@ useEffect(() => {
             vendorName: '',
             transportationInclude: '',
             transporterName: '',
+            vehicleNo: '',
+            driverName: '',
+            driverMobileNo: '',
             amount: 0,
         },
     });
@@ -253,52 +307,6 @@ useEffect(() => {
     const billStatus = form.watch('billStatus');
     const typeOfBill = form.watch('typeOfBill');
 
-    // async function onSubmit(values: z.infer<typeof formSchema>) {
-    //     try {
-    //         let photoUrl = '';
-    //         if (values.photoOfBill) {
-    //             photoUrl = await uploadFile(
-    //                 values.photoOfBill,
-    //                 import.meta.env.VITE_BILL_PHOTO_FOLDER || 'bill-photos'
-    //             );
-    //         }
-
-    //         // Only update the specific fields related to purchase/bill details
-    //         // DO NOT update poNumber (column AQ), poCopy (column AP), or actual4 (column AN)
-    //         await postToSheet(
-    //             indentSheet
-    //                 .filter((s) => s.indentNumber === selectedIndent?.indentNo)
-    //                 .map((prev) => {
-    //                     // Destructure to exclude the fields we don't want to update
-    //                     const { actual4, poNumber, poCopy, ...safeData } = prev;
-
-    //                     return {
-    //                         ...safeData,
-    //                         // Only update these specific fields:
-    //                         actual7: new Date().toISOString(),              // Column BC
-    //                         billStatus: values.billStatus,                  // Column BE
-    //                         billNumber: values.billNo || '',               // Column BF
-    //                         qty: values.qty || prev.approvedQuantity,      // Column BG
-    //                         leadTimeToLiftMaterial: values.leadTime || prev.leadTimeToLiftMaterial, // Column BH
-    //                         typeOfBill: values.typeOfBill || '',           // Column BI
-    //                         billAmount: values.billAmount || 0,            // Column BJ
-    //                         discountAmount: values.discountAmount || 0,    // Column BK
-    //                         paymentType: values.paymentType || '',         // Column BL
-    //                         advanceAmountIfAny: values.advanceAmount || 0, // Column BM
-    //                         photoOfBill: photoUrl,                         // Column BN
-    //                         // actual4, poNumber, and poCopy are explicitly excluded
-    //                     };
-    //                 }),
-    //             'update'
-    //         );
-    //         toast.success(`Updated purchase details for ${selectedIndent?.indentNo}`);
-    //         setOpenDialog(false);
-    //         form.reset();
-    //         setTimeout(() => updateIndentSheet(), 1000);
-    //     } catch {
-    //         toast.error('Failed to update purchase details');
-    //     }
-    // }
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
@@ -329,6 +337,9 @@ useEffect(() => {
                 photoOfBill: photoUrl,
                 transportationInclude: values.transportationInclude || '', // Changed from hardcoded ''
                 transporterName: values.transporterName || '', // Changed from hardcoded ''
+                vehicleNo: values.vehicleNo || '',
+                driverName: values.driverName || '',
+                driverMobileNo: values.driverMobileNo || '',
                 amount: values.amount || 0, // Changed from hardcoded 0
             };
 
@@ -500,7 +511,7 @@ useEffect(() => {
                                                 )}
                                             />
 
-                                            
+
 
                                             <FormField
                                                 control={form.control}
@@ -523,25 +534,16 @@ useEffect(() => {
                                                 name="transportationInclude"
                                                 render={({ field }) => (
                                                     <FormItem>
-                                                        <FormLabel>
-                                                            Transportation Include
-                                                        </FormLabel>
-                                                        <Select
-                                                            onValueChange={field.onChange}
-                                                            value={field.value}
-                                                        >
+                                                        <FormLabel>Transportation Include</FormLabel>
+                                                        <Select onValueChange={field.onChange} value={field.value}>
                                                             <FormControl>
                                                                 <SelectTrigger>
                                                                     <SelectValue placeholder="Select transportation" />
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
-                                                                <SelectItem value="Yes">
-                                                                    Yes
-                                                                </SelectItem>
-                                                                <SelectItem value="No">
-                                                                    No
-                                                                </SelectItem>
+                                                                <SelectItem value="Yes">Yes</SelectItem>
+                                                                <SelectItem value="No">No</SelectItem>
                                                             </SelectContent>
                                                         </Select>
                                                     </FormItem>
@@ -558,11 +560,65 @@ useEffect(() => {
                                                             <Input
                                                                 placeholder="Enter transporter name"
                                                                 {...field}
+                                                                disabled={form.watch("transportationInclude") !== "Yes"}
                                                             />
                                                         </FormControl>
                                                     </FormItem>
                                                 )}
                                             />
+
+                                            <FormField
+                                                control={form.control}
+                                                name="vehicleNo"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Vehical No.</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                placeholder="Enter Vehical No."
+                                                                {...field}
+                                                                disabled={form.watch("transportationInclude") !== "Yes"}
+                                                            />
+                                                        </FormControl>
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={form.control}
+                                                name="driverName"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Driver Name</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                placeholder="Enter Driver name"
+                                                                {...field}
+                                                                disabled={form.watch("transportationInclude") !== "Yes"}
+                                                            />
+                                                        </FormControl>
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={form.control}
+                                                name="driverMobileNo"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Driver Mobile No.</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="number"
+                                                                placeholder="Enter Driver Mobile No."
+                                                                {...field}
+                                                                disabled={form.watch("transportationInclude") !== "Yes"}
+                                                            />
+                                                        </FormControl>
+                                                    </FormItem>
+                                                )}
+                                            />
+
 
                                             <FormField
                                                 control={form.control}

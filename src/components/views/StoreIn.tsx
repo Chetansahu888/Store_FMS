@@ -37,7 +37,7 @@ interface StoreInPendingData {
     billNo: string;
     vendorName: string;
     productName: string;
-    qty: number;
+    // qty: number;
     typeOfBill: string;
     billAmount: number;
     paymentType: string;
@@ -53,7 +53,7 @@ interface StoreInPendingData {
     indentNumber: string;
     product: string;
     uom: string;
-    quantity: number;
+    qty: number;
     poCopy: string;
 
     billStatus: string;
@@ -129,115 +129,114 @@ export default () => {
     const [indentLoading, setIndentLoading] = useState(false);
     const [receivedLoading, setReceivedLoading] = useState(false);
 
-   useEffect(() => {
-    setTableData(
-        storeInSheet
-            .filter((i) => i.planned6 !== '' && i.actual6 === '')
-            .map((i) => ({
-                liftNumber: i.liftNumber || '',
-                indentNo: i.indentNo || '',
-                billNo: String(i.billNo) || '',
-                vendorName: i.vendorName || '',
-                productName: i.productName || '',
-                qty: i.qty || 0,
-                typeOfBill: i.typeOfBill || '',
-                billAmount: i.billAmount || 0,
-                paymentType: i.paymentType || '',
-                advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0, // ✅ ADD Number()
-                photoOfBill: i.photoOfBill || '',
-                transportationInclude: i.transportationInclude || '',
-                transporterName: i.transporterName || '',
-                amount: i.amount || 0,
-                // Add missing mapped properties
-                poDate: i.poDate || '',
-                poNumber: i.poNumber || '',
-                vendor: i.vendor || '',
-                indentNumber: i.indentNumber || '',
-                product: i.product || '',
-                uom: i.uom || '',
-                quantity: i.quantity || 0,
-                poCopy: i.poCopy || '',
+    useEffect(() => {
+        setTableData(
+            storeInSheet
+                .filter((i) => i.planned6 !== '' && i.actual6 === '')
+                .map((i) => ({
+                    liftNumber: i.liftNumber || '',
+                    indentNo: i.indentNo || '',
+                    billNo: String(i.billNo) || '',
+                    vendorName: i.vendorName || '',
+                    productName: i.productName || '',
+                    qty: i.qty || 0,
+                    typeOfBill: i.typeOfBill || '',
+                    billAmount: i.billAmount || 0,
+                    paymentType: i.paymentType || '',
+                    advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0, // ✅ ADD Number()
+                    photoOfBill: i.photoOfBill || '',
+                    transportationInclude: i.transportationInclude || '',
+                    transporterName: i.transporterName || '',
+                    amount: i.amount || 0,
+                    // Add missing mapped properties
+                    poDate: i.poDate || '',
+                    poNumber: i.poNumber || '',
+                    vendor: i.vendor || '',
+                    indentNumber: i.indentNumber || '',
+                    product: i.product || '',
+                    uom: i.uom || '',
+                    // qty: i.qty || 0,
+                    poCopy: i.poCopy || '',
+                    billStatus: i.billStatus || '',
+                    leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
+                    discountAmount: i.discountAmount || 0,
+                }))
+        );
+    }, [storeInSheet]);
 
-                billStatus: i.billStatus || '',
-                leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
-                discountAmount: i.discountAmount || 0,
-            }))
-    );
-}, [storeInSheet]);
+    useEffect(() => {
+        setHistoryData(
+            storeInSheet
+                .filter((i) => i.actual6 !== '')
+                .map((i) => ({
+                    liftNumber: i.liftNumber || '',
+                    indentNo: i.indentNo || '',
+                    billNo: String(i.billNo) || '',
+                    vendorName: i.vendorName || '',
+                    productName: i.productName || '',
+                    qty: i.qty || 0,
+                    typeOfBill: i.typeOfBill || '',
+                    billAmount: i.billAmount || 0,
+                    paymentType: i.paymentType || '',
+                    advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0, // ✅ ADD Number()
+                    photoOfBill: i.photoOfBill || '',
+                    transportationInclude: i.transportationInclude || '',
+                    transporterName: i.transporterName || '',
+                    amount: i.amount || 0,
+                    billStatus: i.billStatus || '',
+                    receivedQuantity: i.receivedQuantity || 0,
+                    photoOfProduct: i.photoOfProduct || '',
+                    unitOfMeasurement: i.unitOfMeasurement || '',
+                    damageOrder: i.damageOrder || '',
+                    quantityAsPerBill: i.quantityAsPerBill || 0,
+                    priceAsPerPo: i.priceAsPerPo || 0,
+                    remark: i.remark || '',
+                    // Map from existing StoreInSheet properties or set defaults
+                    poDate: '', // This doesn't exist in StoreInSheet
+                    poNumber: '', // This doesn't exist in StoreInSheet
+                    receiveStatus: i.status || '', // Map from 'status' field
+                    vendor: i.vendorName || '', // Map from vendorName
+                    product: i.productName || '', // Map from productName
+                    orderQuantity: i.qty || 0, // Map from qty
+                    receivedDate: i.timestamp || '', // Map from timestamp or set default
+                    warrantyStatus: '', // This doesn't exist in StoreInSheet
+                    warrantyEndDate: '', // This doesn't exist in StoreInSheet
+                    billNumber: i.billNumber || '', // This exists in StoreInSheet
+                    anyTransport: i.transportationInclude || '', // Map from transportationInclude
+                    transportingAmount: i.amount || 0, // Map from amount or set default
 
-  useEffect(() => {
-    setHistoryData(
-        storeInSheet
-            .filter((i) => i.actual6 !== '')
-            .map((i) => ({
-                liftNumber: i.liftNumber || '',
-                indentNo: i.indentNo || '',
-                billNo: String(i.billNo) || '',
-                vendorName: i.vendorName || '',
-                productName: i.productName || '',
-                qty: i.qty || 0,
-                typeOfBill: i.typeOfBill || '',
-                billAmount: i.billAmount || 0,
-                paymentType: i.paymentType || '',
-                advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0, // ✅ ADD Number()
-                photoOfBill: i.photoOfBill || '',
-                transportationInclude: i.transportationInclude || '',
-                transporterName: i.transporterName || '',
-                amount: i.amount || 0,
-                billStatus: i.billStatus || '',
-                receivedQuantity: i.receivedQuantity || 0,
-                photoOfProduct: i.photoOfProduct || '',
-                unitOfMeasurement: i.unitOfMeasurement || '',
-                damageOrder: i.damageOrder || '',
-                quantityAsPerBill: i.quantityAsPerBill || 0,
-                priceAsPerPo: i.priceAsPerPo || 0,
-                remark: i.remark || '',
-                // Map from existing StoreInSheet properties or set defaults
-                poDate: '', // This doesn't exist in StoreInSheet
-                poNumber: '', // This doesn't exist in StoreInSheet
-                receiveStatus: i.status || '', // Map from 'status' field
-                vendor: i.vendorName || '', // Map from vendorName
-                product: i.productName || '', // Map from productName
-                orderQuantity: i.qty || 0, // Map from qty
-                receivedDate: i.timestamp || '', // Map from timestamp or set default
-                warrantyStatus: '', // This doesn't exist in StoreInSheet
-                warrantyEndDate: '', // This doesn't exist in StoreInSheet
-                billNumber: i.billNumber || '', // This exists in StoreInSheet
-                anyTransport: i.transportationInclude || '', // Map from transportationInclude
-                transportingAmount: i.amount || 0, // Map from amount or set default
+                    timestamp: i.timestamp || '',
+                    leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
+                    discountAmount: i.discountAmount || 0,
+                    billReceived: i.billStatus || '',
+                    billImage: i.photoOfBill || '',
+                }))
+        );
+    }, [storeInSheet]);
 
-                timestamp: i.timestamp || '',
-                leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
-                discountAmount: i.discountAmount || 0,
-                billReceived: i.billStatus || '',
-                billImage: i.photoOfBill || '',
-            }))
-    );
-}, [storeInSheet]);
 
-   
     const columns: ColumnDef<RecieveItemsData>[] = [
         ...(user.receiveItemView
             ? [
-                  {
-                      header: 'Action',
-                      cell: ({ row }: { row: Row<RecieveItemsData> }) => {
-                          const indent = row.original;
-                          return (
-                              <DialogTrigger asChild>
-                                  <Button
-                                      variant="outline"
-                                      onClick={() => {
-                                          setSelectedIndent(indent);
-                                      }}
-                                  >
-                                      Store In
-                                  </Button>
-                              </DialogTrigger>
-                          );
-                      },
-                  },
-              ]
+                {
+                    header: 'Action',
+                    cell: ({ row }: { row: Row<RecieveItemsData> }) => {
+                        const indent = row.original;
+                        return (
+                            <DialogTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        setSelectedIndent(indent);
+                                    }}
+                                >
+                                    Store In
+                                </Button>
+                            </DialogTrigger>
+                        );
+                    },
+                },
+            ]
             : []),
         { accessorKey: 'liftNumber', header: 'Lift Number' },
         { accessorKey: 'indentNo', header: 'Indent No.' },
@@ -270,7 +269,7 @@ export default () => {
         { accessorKey: 'amount', header: 'Amount' },
     ];
 
-  
+
     const historyColumns: ColumnDef<HistoryData>[] = [
         { accessorKey: 'timestamp', header: 'Timestamp' },
         { accessorKey: 'liftNumber', header: 'Lift Number' },
@@ -343,7 +342,7 @@ export default () => {
 
     const schema = z.object({
         status: z.enum(['Received', 'Not Received']),
-        quantity: z.coerce.number().optional(),
+        qty: z.coerce.number().optional(),
         photoOfProduct: z.instanceof(File).optional(),
         warrantyStatus: z.enum(['Not Any', 'Warranty', 'Gaurantee']).optional(),
         warrantyDate: z.coerce.date().optional(),
@@ -355,7 +354,7 @@ export default () => {
         quantityAsPerBill: z.enum(['Yes', 'No']),
         priceAsPerPo: z.enum(['Yes', 'No']),
         remark: z.string().optional(),
-        materialStatus: z.enum(['ok', 'not ok']).optional(),
+        materialStatus: z.enum(['ok', 'not ok', 'exchange']).optional(),
     });
 
     const form = useForm({
@@ -366,7 +365,7 @@ export default () => {
             priceAsPerPo: undefined,
             remark: '',
             status: undefined,
-            quantity: undefined,
+            qty: undefined,
             warrantyStatus: undefined,
             warrantyDate: undefined,
             billReceived: undefined,
@@ -384,7 +383,7 @@ export default () => {
 
     useEffect(() => {
         if (selectedIndent) {
-            form.setValue('quantity', selectedIndent.quantity);
+            form.setValue('qty', selectedIndent.qty);
         } else if (!openDialog) {
             form.reset({
                 damageOrder: undefined,
@@ -392,7 +391,7 @@ export default () => {
                 priceAsPerPo: undefined,
                 remark: '',
                 status: undefined,
-                quantity: undefined,
+                qty: undefined,
                 warrantyStatus: undefined,
                 warrantyDate: undefined,
                 billReceived: undefined,
@@ -433,29 +432,29 @@ export default () => {
 
             // Update the existing record in STORE IN sheet
             await postToSheet(
-    storeInSheet
-        .filter((s) => s.liftNumber === selectedIndent?.liftNumber)
-        .map((prev) => ({
-            rowIndex: prev.rowIndex,  // ✅ Only send rowIndex to identify the row
-            actual6: new Date().toISOString(),
-            receivingStatus: values.status,
-            receivedQuantity: values.quantity || 0,
-            photoOfProduct: photoOfProductUrl,
-            warrenty: values.warrantyStatus || '',
-            endDateWarrenty: values.warrantyDate ? formatDate(values.warrantyDate) : '',
-            billReceived: values.billReceived || '',
-            billNumber: values.billNo || '',
-            billAmount: values.billAmount || 0,
-            billImage: photoOfBillUrl,
-            damageOrder: values.damageOrder,
-            quantityAsPerBill: values.quantityAsPerBill === 'Yes' ? 1 : 0,
-            priceAsPerPo: values.priceAsPerPo === 'Yes' ? 1 : 0,
-            remark: values.remark || '',
-            materialStatus: values.materialStatus || '', 
-        })),
-    'update',
-    'STORE IN'
-);
+                storeInSheet
+                    .filter((s) => s.liftNumber === selectedIndent?.liftNumber)
+                    .map((prev) => ({
+                        rowIndex: prev.rowIndex,  // ✅ Only send rowIndex to identify the row
+                        actual6: new Date().toISOString(),
+                        receivingStatus: values.status,
+                        receivedQuantity: values.qty || 0,
+                        photoOfProduct: photoOfProductUrl,
+                        warrenty: values.warrantyStatus || '',
+                        endDateWarrenty: values.warrantyDate ? formatDate(values.warrantyDate) : '',
+                        billReceived: values.billReceived || '',
+                        billNumber: values.billNo || '',
+                        billAmount: values.billAmount || 0,
+                        billImage: photoOfBillUrl,
+                        damageOrder: values.damageOrder,
+                        quantityAsPerBill: values.quantityAsPerBill === 'Yes' ? 1 : 0,
+                        priceAsPerPo: values.priceAsPerPo === 'Yes' ? 1 : 0,
+                        remark: values.remark || '',
+                        materialStatus: values.materialStatus || '',
+                    })),
+                'update',
+                'STORE IN'
+            );
 
             toast.success(`Updated store record for ${selectedIndent?.liftNumber}`);
             setOpenDialog(false);
@@ -535,10 +534,10 @@ export default () => {
                                         </div>
                                         <div className="space-y-1">
                                             <p className="font-medium text-nowrap">
-                                                Ordered Quantity
+                                                Lifiting Quantity
                                             </p>
                                             <p className="text-sm font-light">
-                                                {selectedIndent.quantity}
+                                                {selectedIndent.qty}
                                             </p>
                                         </div>
                                         <div className="space-y-1">
@@ -582,7 +581,7 @@ export default () => {
 
                                     <FormField
                                         control={form.control}
-                                        name="quantity"
+                                        name="qty"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Received Quantity</FormLabel>
@@ -674,8 +673,8 @@ export default () => {
                                                         value={
                                                             field.value
                                                                 ? field.value
-                                                                      .toISOString()
-                                                                      .split('T')[0]
+                                                                    .toISOString()
+                                                                    .split('T')[0]
                                                                 : ''
                                                         }
                                                         onChange={(e) =>
@@ -862,28 +861,29 @@ export default () => {
                                     />
 
                                     <FormField
-    control={form.control}
-    name="materialStatus"
-    render={({ field }) => (
-        <FormItem>
-            <FormLabel>Material Status</FormLabel>
-            <FormControl>
-                <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                >
-                    <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select material status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="ok">ok</SelectItem>
-                        <SelectItem value="not ok">not ok</SelectItem>
-                    </SelectContent>
-                </Select>
-            </FormControl>
-        </FormItem>
-    )}
-/>
+                                        control={form.control}
+                                        name="materialStatus"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Material Status</FormLabel>
+                                                <FormControl>
+                                                    <Select
+                                                        onValueChange={field.onChange}
+                                                        value={field.value}
+                                                    >
+                                                        <SelectTrigger className="w-full">
+                                                            <SelectValue placeholder="Select material status" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="ok">ok</SelectItem>
+                                                            <SelectItem value="not ok">not ok</SelectItem>
+                                                            <SelectItem value="exchange">Exchange</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
 
                                     <FormField
                                         control={form.control}

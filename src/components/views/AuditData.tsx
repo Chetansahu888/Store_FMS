@@ -29,9 +29,9 @@ import Heading from '../element/Heading';
 import { Pill } from '../ui/pill';
 
 interface TallyEntryPendingData {
-    indentNo: string;
-    indentDate: string;
-    purchaseDate: string;
+    indentNumber: string;
+    liftNumber: string;
+    poNumber: string;
     materialInDate: string;
     productName: string;
     billNo: string;
@@ -53,9 +53,9 @@ interface TallyEntryPendingData {
 }
 
 interface TallyEntryHistoryData {
-    indentNo: string;
-    indentDate: string;
-    purchaseDate: string;
+    indentNumber: string;
+    liftNumber: string;
+    poNumber: string;
     materialInDate: string;
     productName: string;
     billNo: string;
@@ -92,9 +92,9 @@ export default () => {
             tallyEntrySheet
                 .filter((i) => i.planned1 !== '' && i.actual1 === '')
                 .map((i) => ({
-                    indentNo: i.indentNo || '',
-                    indentDate: i.indentDate || '',
-                    purchaseDate: i.purchaseDate || '',
+                    indentNumber: i.indentNumber || '',
+                    liftNumber: i.liftNumber || '',
+                    poNumber: i.poNumber || '',
                     materialInDate: i.materialInDate || '',
                     productName: i.productName || '',
                     billNo: i.billNo || '',
@@ -116,15 +116,16 @@ export default () => {
                 }))
         );
     }, [tallyEntrySheet]);
+    console.log("Pending Data:", pendingData);
 
     useEffect(() => {
         setHistoryData(
             tallyEntrySheet
                 .filter((i) => i.planned1 !== '' && i.actual1 !== '')
                 .map((i) => ({
-                    indentNo: i.indentNo || '',
-                    indentDate: i.indentDate || '',
-                    purchaseDate: i.purchaseDate || '',
+                    indentNumber: i.indentNumber || '',
+                    liftNumber: i.liftNumber || '',
+                    poNumber: i.poNumber || '',
                     materialInDate: i.materialInDate || '',
                     productName: i.productName || '',
                     billNo: i.billNo || '',
@@ -182,17 +183,19 @@ export default () => {
                 },
             ]
             : []),
-        { accessorKey: 'indentNo', header: 'Indent No.' },
+        { accessorKey: 'indentNumber', header: 'Indent No.' },
         {
-            accessorKey: 'indentDate',
-            header: 'Indent Date',
-            cell: ({ row }) => formatDate(row.original.indentDate)
+            accessorKey: 'liftNumber',
+            header: 'Lift Number',
+            cell: ({ row }) => row.original.liftNumber || ''
         },
+
         {
-            accessorKey: 'purchaseDate',
-            header: 'Purchase Date',
-            cell: ({ row }) => formatDate(row.original.purchaseDate)
+            accessorKey: 'poNumber',
+            header: 'Po Number',
+            cell: ({ row }) => row.original.poNumber || ''
         },
+
         {
             accessorKey: 'materialInDate',
             header: 'Material In Date',
@@ -244,16 +247,16 @@ export default () => {
     ];
 
     const historyColumns: ColumnDef<TallyEntryHistoryData>[] = [
-        { accessorKey: 'indentNo', header: 'Indent No.' },
+        { accessorKey: 'indentNumber', header: 'Indent No.' },
         {
-            accessorKey: 'indentDate',
-            header: 'Indent Date',
-            cell: ({ row }) => formatDate(row.original.indentDate)
+            accessorKey: 'liftNumber',
+            header: 'Lift Number',
+            cell: ({ row }) => formatDate(row.original.liftNumber)
         },
         {
-            accessorKey: 'purchaseDate',
-            header: 'Purchase Date',
-            cell: ({ row }) => formatDate(row.original.purchaseDate)
+            accessorKey: 'poNumber',
+            header: 'Po Number',
+            cell: ({ row }) => formatDate(row.original.poNumber)
         },
         {
             accessorKey: 'materialInDate',
@@ -361,7 +364,7 @@ export default () => {
             // Update the sheet
             await postToSheet(
                 tallyEntrySheet
-                    .filter((s) => s.indentNo === selectedItem?.indentNo)
+                    .filter((s) => s.indentNumber === selectedItem?.indentNumber)
                     .map((prev) => ({
                         rowIndex: prev.rowIndex,  // ✅ Only rowIndex to identify the row
                         actual1: currentDateTime,  // ✅ New timestamp
@@ -372,9 +375,14 @@ export default () => {
                 'TALLY ENTRY'
             );
 
-            toast.success(`Updated status for ${selectedItem?.indentNo}`);
+            toast.success(`Updated status for ${selectedItem?.indentNumber}`);
             setOpenDialog(false);
             setTimeout(() => updateAll(), 1000);
+            console.log("Form values:", values);
+            console.log("Current DateTime:", currentDateTime);
+            console.log("Selected Item:", selectedItem);
+            console.log("Filtered Rows:", tallyEntrySheet.filter(s => s.indentNumber === selectedItem?.indentNumber));
+
         } catch {
             toast.error('Failed to update status');
         }
@@ -401,7 +409,7 @@ export default () => {
                         <DataTable
                             data={pendingData}
                             columns={pendingColumns}
-                            searchFields={['indentNo', 'productName', 'partyName', 'billNo']}
+                            searchFields={['indentNumber', 'productName', 'partyName', 'billNo']}
                             dataLoading={false}
                         />
                     </TabsContent>
@@ -410,7 +418,7 @@ export default () => {
                             data={historyData}
                             columns={historyColumns}
                             searchFields={[
-                                'indentNo',
+                                'indentNumber',
                                 'productName',
                                 'partyName',
                                 'billNo',
@@ -432,7 +440,7 @@ export default () => {
                                     <DialogTitle>Process Tally Entry</DialogTitle>
                                     <DialogDescription>
                                         Process entry for indent number{' '}
-                                        <span className="font-medium">{selectedItem.indentNo}</span>
+                                        <span className="font-medium">{selectedItem.indentNumber}</span>
                                     </DialogDescription>
                                 </DialogHeader>
 
@@ -442,7 +450,7 @@ export default () => {
                                         <div className="space-y-1">
                                             <p className="font-medium text-nowrap">Indent No.</p>
                                             <p className="text-sm font-light">
-                                                {selectedItem.indentNo}
+                                                {selectedItem.indentNumber}
                                             </p>
                                         </div>
                                         <div className="space-y-1">

@@ -220,7 +220,7 @@ const routes: RouteAttributes[] = [
     {
         path: 'Quality-Check-In-Received-Item',
         // gateKey: 'poMaster',
-        name: 'Quality Check In Received Item',
+        name: 'Instead of Quality Check In Received Item						',
         icon: <Users size={20} />,
         element: <QuantityCheckInReceiveItem />,
         notifications: () => 0,

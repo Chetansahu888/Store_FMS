@@ -146,13 +146,13 @@ export default () => {
             })
         ),
         terms: z.array(z.string().nonempty()).max(10),
-        preparedBy: z.string().nonempty(),
-        approvedBy: z.string().nonempty(),
+        // preparedBy: z.string().nonempty(),
+        // approvedBy: z.string().nonempty(),
 
         deliveryDate: z.coerce.date(),
         deliveryDays: z.coerce.number().optional(), // NEW FIELD
         deliveryType: z.enum(['for', 'exfactory']).optional(), // NEW FIELD
-        paymentTerms: z.enum(['Advance', 'Party PI', 'Party Advance', 'After Delivery']),
+        paymentTerms: z.enum([ 'Party PI', 'Advance', 'After Delivery']),
         numberOfDays: z.coerce.number().optional(),
     });
 
@@ -164,8 +164,8 @@ export default () => {
             poDate: new Date(),
             supplierName: '',
             supplierAddress: '',
-            preparedBy: '',
-            approvedBy: '',
+            // preparedBy: '',
+            // approvedBy: '',
             gstin: '',
             quotationNumber: '',
             quotationDate: new Date(),
@@ -223,8 +223,8 @@ export default () => {
                 poDate: undefined,
                 supplierName: '',
                 supplierAddress: '',
-                preparedBy: '',
-                approvedBy: '',
+                // preparedBy: '',
+                // approvedBy: '',
                 gstin: '',
                 quotationNumber: '',
                 quotationDate: undefined,
@@ -241,8 +241,8 @@ export default () => {
                 poDate: new Date(),
                 supplierName: '',
                 supplierAddress: '',
-                preparedBy: '',
-                approvedBy: '',
+                // preparedBy: '',
+                // approvedBy: '',
                 gstin: '',
                 quotationNumber: '',
                 quotationDate: new Date(),
@@ -319,8 +319,8 @@ export default () => {
             form.setValue('poDate', new Date(po.timestamp));
             form.setValue('supplierName', po.partyName);
             form.setValue('supplierAddress', vendor?.address || '');
-            form.setValue('preparedBy', po.preparedBy);
-            form.setValue('approvedBy', po.approvedBy);
+            // form.setValue('preparedBy', po.preparedBy);
+            // form.setValue('approvedBy', po.approvedBy);
             form.setValue('gstin', vendor?.gstin || '');
             form.setValue('quotationNumber', po.quotationNumber);
             form.setValue('quotationDate', new Date(po.quotationDate));
@@ -462,8 +462,8 @@ export default () => {
                 ),
                 grandTotal: grandTotal,
                 terms: values.terms,
-                preparedBy: values.preparedBy,
-                approvedBy: values.approvedBy,
+                // preparedBy: values.preparedBy,
+                // approvedBy: values.approvedBy,
             };
 
             const blob = await pdf(<POPdf {...pdfProps} />).toBlob();
@@ -519,8 +519,8 @@ export default () => {
                     ),
                     totalPoAmount: grandTotal,
                     pdf: url,
-                    preparedBy: values.preparedBy,
-                    approvedBy: values.approvedBy,
+                    // preparedBy: values.preparedBy,
+                    // approvedBy: values.approvedBy,
                     quotationNumber: values.quotationNumber,
                     quotationDate: formatDateTime(values.quotationDate),
                     enquiryNumber: values.ourEnqNo,
@@ -987,14 +987,12 @@ export default () => {
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        <SelectItem value="Advance">
-                                                            Advance
-                                                        </SelectItem>
+                                                        
                                                         <SelectItem value="Party PI">
                                                             Party PI
                                                         </SelectItem>
-                                                        <SelectItem value="Party Advance">
-                                                            Party Advance
+                                                        <SelectItem value="Advance">
+                                                            Advance
                                                         </SelectItem>
                                                         <SelectItem value="After Delivery">
                                                             After Delivery
@@ -1479,7 +1477,7 @@ export default () => {
                             <hr />
 
                             <div className="text-center flex justify-between gap-5 px-7 items-center">
-                                <FormField
+                                {/* <FormField
                                     control={form.control}
                                     name="preparedBy"
                                     render={({ field }) => (
@@ -1494,8 +1492,8 @@ export default () => {
                                             </FormControl>
                                         </FormItem>
                                     )}
-                                />
-                                <FormField
+                                /> */}
+                                {/* <FormField
                                     control={form.control}
                                     name="approvedBy"
                                     render={({ field }) => (
@@ -1510,7 +1508,7 @@ export default () => {
                                             </FormControl>
                                         </FormItem>
                                     )}
-                                />
+                                /> */}
                                 <p className="break-words min-w-1/4">For {details?.companyName}</p>
                             </div>
                         </div>
