@@ -11,8 +11,8 @@ interface HistoryData {
     poNumber: string;
     poCopy: string;
     vendorName: string;
-    preparedBy: string;
-    approvedBy: string;
+    // preparedBy: string;
+    // approvedBy: string;
     totalAmount: number;
     status: 'Revised' | 'Not Recieved' | 'Recieved';
 }
@@ -26,10 +26,10 @@ export default () => {
     useEffect(() => {
         setHistoryData(
             poMasterSheet.map((sheet) => ({
-                approvedBy: sheet.approvedBy,
+                // approvedBy: sheet.approvedBy,
                 poCopy: sheet.pdf,
                 poNumber: sheet.poNumber,
-                preparedBy: sheet.preparedBy,
+                // preparedBy: sheet.preparedBy,
                 totalAmount: sheet.totalPoAmount,
                 vendorName: sheet.partyName,
                 status: indentSheet.map((s) => s.poNumber).includes(sheet.poNumber)

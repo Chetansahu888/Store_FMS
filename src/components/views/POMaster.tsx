@@ -24,8 +24,8 @@ interface PendingIndentsData {
     discountPercent: number;
     amount: number;
     totalPoAmount: number;
-    preparedBy: string;
-    approvedBy: string;
+    // preparedBy: string;
+    // approvedBy: string;
     pdf: string;
 }
 
@@ -125,8 +125,8 @@ export default () => {
                             discountPercent: Number(sheet.discountPercent) || 0,
                             amount: Number(sheet.amount) || 0,
                             totalPoAmount: Number(sheet.totalPoAmount) || 0,
-                            preparedBy: sheet.preparedBy || '',
-                            approvedBy: sheet.approvedBy || '',
+                            // preparedBy: sheet.preparedBy || '',
+                            // approvedBy: sheet.approvedBy || '',
                             pdf: sheet.pdf || '',
                         };
                     })
