@@ -542,6 +542,7 @@ export default () => {
                     numberOfDays: values.numberOfDays || 0,
                     deliveryDays: values.deliveryDays || 0, // ADD THIS (Column AH)
                     deliveryType: values.deliveryType || '', // ADD THIS (Column AI)
+                    firmNameMatch: indent.firmNameMatch ?? '',
                 };
             });
 
