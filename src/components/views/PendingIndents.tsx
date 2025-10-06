@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { formatDate } from '@/lib/utils';
 import DataTable from '../element/DataTable';
+import { useAuth } from '@/context/AuthContext';
+
 
 interface PendingIndentsData {
     date: string;
@@ -20,6 +22,7 @@ interface PendingIndentsData {
 
 export default () => {
     const { indentSheet, indentLoading } = useSheets();
+    const { user } = useAuth();
 
     const [tableData, setTableData] = useState<PendingIndentsData[]>([]);
 
@@ -28,13 +31,39 @@ export default () => {
     },[indentSheet])
 
     // Fetching table data
+    // useEffect(() => {
+    //     setTableData(
+    //         indentSheet
+    //             .filter((sheet) => sheet.status === "Pending")
+    //             .map((sheet) => ({
+    //                 date: formatDate(new Date(sheet.timestamp)),
+    //                 indentNo: sheet.indentNumber,
+    //                 product: sheet.productName,
+    //                 quantity: sheet.pendingPoQty,
+    //                 rate: sheet.approvedRate,
+    //                 uom: sheet.uom,
+    //                 vendorName: sheet.approvedVendorName,
+    //                 paymentTerm: sheet.approvedPaymentTerm,
+    //                 specifications: sheet.specifications || '',
+    //             }))
+    //             // Sort by indentNo in descending order
+    //             .sort((a, b) => b.indentNo.localeCompare(a.indentNo))
+    //     );
+    // }, [indentSheet]);
+
     useEffect(() => {
+        // Pehle firm name se filter karo (case-insensitive)
+        const filteredByFirm = indentSheet.filter(sheet => 
+            user.firmNameMatch.toLowerCase() === "all" || sheet.firmName === user.firmNameMatch
+        );
+        
         setTableData(
-            indentSheet
+            filteredByFirm
                 .filter((sheet) => sheet.status === "Pending")
                 .map((sheet) => ({
                     date: formatDate(new Date(sheet.timestamp)),
                     indentNo: sheet.indentNumber,
+                    firmNameMatch: sheet.firmNameMatch || '',
                     product: sheet.productName,
                     quantity: sheet.pendingPoQty,
                     rate: sheet.approvedRate,
@@ -46,7 +75,9 @@ export default () => {
                 // Sort by indentNo in descending order
                 .sort((a, b) => b.indentNo.localeCompare(a.indentNo))
         );
-    }, [indentSheet]);
+    }, [indentSheet, user.firmNameMatch]);
+
+
 
     // Creating table columns with compact Product column
     const columns: ColumnDef<PendingIndentsData>[] = [
@@ -60,6 +91,11 @@ export default () => {
             header: 'Indent Number',
             cell: ({ getValue }) => <div className="px-2">{getValue() as string}</div>
         },
+        {
+        accessorKey: 'firmNameMatch', // Add this line
+        header: 'Firm Name',
+        cell: ({ getValue }) => <div className="px-2">{getValue() as string}</div>
+    },
         {
             accessorKey: 'product',
             header: 'Product',
@@ -117,7 +153,7 @@ export default () => {
             <DataTable
                 data={tableData}
                 columns={columns}
-                searchFields={['product', 'vendorName', 'paymentTerm', 'specifications']}
+                searchFields={['product', 'vendorName', 'paymentTerm', 'specifications','firmNameMatch']}
                 dataLoading={indentLoading}
                 className="h-[80dvh]"
             />

@@ -64,41 +64,92 @@ export default () => {
     const [editValues, setEditValues] = useState<Partial<HistoryData>>({});
 
     // Fetching table data
-    useEffect(() => {
-        setTableData(
-            indentSheet
-                .filter((sheet) => sheet.planned2 !== '' && sheet.actual2 === '')
-                .map((sheet) => ({
-                    indentNo: sheet.indentNumber,
-                    indenter: sheet.indenterName,
-                    department: sheet.department,
-                    product: sheet.productName,
-                    quantity: sheet.approvedQuantity,
-                    uom: sheet.uom,
-                    vendorType: sheet.vendorType as VendorUpdateData['vendorType'],
-                }))
-        );
-        setHistoryData(
-            indentSheet
-                .filter((sheet) => sheet.planned2 !== '' && sheet.actual2 !== '')
-                .map((sheet) => ({
-                    date: formatDate(new Date(sheet.actual2)),
-                    indentNo: sheet.indentNumber,
-                    indenter: sheet.indenterName,
-                    department: sheet.department,
-                    product: sheet.productName,
-                    quantity: sheet.quantity,
-                    uom: sheet.uom,
-                    rate: sheet.approvedRate || 0,
-                    vendorType: sheet.vendorType as HistoryData['vendorType'],
-                    // lastUpdated: sheet.lastUpdated,
-                }))
-                // Sort by indentNo in descending order (newest first)
-                .sort((a, b) => {
-                    return b.indentNo.localeCompare(a.indentNo);
-                })
-        );
-    }, [indentSheet]);
+    // useEffect(() => {
+    //     setTableData(
+    //         indentSheet
+    //             .filter((sheet) => sheet.planned2 !== '' && sheet.actual2 === '')
+    //             .map((sheet) => ({
+    //                 indentNo: sheet.indentNumber,
+    //                 indenter: sheet.indenterName,
+    //                 department: sheet.department,
+    //                 product: sheet.productName,
+    //                 quantity: sheet.approvedQuantity,
+    //                 uom: sheet.uom,
+    //                 vendorType: sheet.vendorType as VendorUpdateData['vendorType'],
+    //             }))
+    //     );
+    //     setHistoryData(
+    //         indentSheet
+    //             .filter((sheet) => sheet.planned2 !== '' && sheet.actual2 !== '')
+    //             .map((sheet) => ({
+    //                 date: formatDate(new Date(sheet.actual2)),
+    //                 indentNo: sheet.indentNumber,
+    //                 indenter: sheet.indenterName,
+    //                 department: sheet.department,
+    //                 product: sheet.productName,
+    //                 quantity: sheet.quantity,
+    //                 uom: sheet.uom,
+    //                 rate: sheet.approvedRate || 0,
+    //                 vendorType: sheet.vendorType as HistoryData['vendorType'],
+    //                 // lastUpdated: sheet.lastUpdated,
+    //             }))
+    //             // Sort by indentNo in descending order (newest first)
+    //             .sort((a, b) => {
+    //                 return b.indentNo.localeCompare(a.indentNo);
+    //             })
+    //     );
+    // }, [indentSheet]);
+
+    // Fetching table data
+useEffect(() => {
+    // Pehle firm name se filter karo
+    const filteredByFirm = indentSheet.filter(sheet => 
+        user.firmNameMatch.toLowerCase() === "all" || sheet.firmName === user.firmNameMatch
+    );
+    
+    setTableData(
+        filteredByFirm
+            .filter((sheet) => sheet.planned2 !== '' && sheet.actual2 === '')
+            .map((sheet) => ({
+                indentNo: sheet.indentNumber,
+                firmNameMatch: sheet.firmNameMatch || '',
+                indenter: sheet.indenterName,
+                department: sheet.department,
+                product: sheet.productName,
+                quantity: sheet.approvedQuantity,
+                uom: sheet.uom,
+                vendorType: sheet.vendorType as VendorUpdateData['vendorType'],
+            }))
+    );
+}, [indentSheet, user.firmNameMatch]);
+
+useEffect(() => {
+    // Pehle firm name se filter karo
+    const filteredByFirm = indentSheet.filter(sheet => 
+        user.firmNameMatch.toLowerCase() === "all" || sheet.firmName === user.firmNameMatch
+    );
+    
+    setHistoryData(
+        filteredByFirm
+            .filter((sheet) => sheet.planned2 !== '' && sheet.actual2 !== '')
+            .map((sheet) => ({
+                date: formatDate(new Date(sheet.actual2)),
+                indentNo: sheet.indentNumber,
+                firmNameMatch: sheet.firmNameMatch || '',
+                indenter: sheet.indenterName,
+                department: sheet.department,
+                product: sheet.productName,
+                quantity: sheet.quantity,
+                uom: sheet.uom,
+                rate: sheet.approvedRate || 0,
+                vendorType: sheet.vendorType as HistoryData['vendorType'],
+            }))
+            // Sort by indentNo in descending order (newest first)
+            .sort((a, b) => {
+                return b.indentNo.localeCompare(a.indentNo);
+            })
+    );
+}, [indentSheet, user.firmNameMatch]);
 
     const handleEditClick = (row: HistoryData) => {
         setEditingRow(row.indentNo);
@@ -173,6 +224,10 @@ export default () => {
             header: 'Indent No.',
         },
         {
+        accessorKey: 'firmNameMatch', // Add this line
+        header: 'Firm Name',
+    },
+        {
             accessorKey: 'indenter',
             header: 'Indenter',
         },
@@ -243,6 +298,10 @@ export default () => {
             accessorKey: 'indentNo',
             header: 'Indent No.',
         },
+        {
+        accessorKey: 'firmNameMatch', // Add this line
+        header: 'Firm Name',
+    },
         {
             accessorKey: 'indenter',
             header: 'Indenter',
@@ -599,7 +658,7 @@ export default () => {
                         <DataTable
                             data={tableData}
                             columns={columns}
-                            searchFields={['product', 'department', 'indenter', 'vendorType']}
+                            searchFields={['product', 'department', 'indenter', 'vendorType','firmNameMatch']}
                             dataLoading={indentLoading}
                         />
                     </TabsContent>

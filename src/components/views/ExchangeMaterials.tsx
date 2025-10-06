@@ -67,6 +67,7 @@ interface ExchangePendingData {
     billNumber2: string;
     planned10: string;
     actual10: string;
+    firmNameMatch: string;
 }
 
 interface ExchangeHistoryData {
@@ -108,6 +109,7 @@ interface ExchangeHistoryData {
     billNumber2: string;
     planned10: string;
     actual10: string;
+    firmNameMatch: string;
 }
 
 
@@ -120,9 +122,113 @@ const ExchangeMaterials = () => {
     const [selectedItem, setSelectedItem] = useState<ExchangePendingData | null>(null);
     const [openDialog, setOpenDialog] = useState(false);
 
- useEffect(() => {
+// useEffect(() => {
+//     setPendingData(
+//         storeInSheet
+//             .filter((i) => 
+//                 i.planned10 && i.planned10 !== '' && 
+//                 (!i.actual10 || i.actual10 === '')
+//             )
+//             .map((i) => ({
+//                 timestamp: i.timestamp || '',
+//                 liftNumber: i.liftNumber || '',
+//                 indentNo: i.indentNo || '',
+//                 poNumber: i.poNumber || '',
+//                 vendorName: i.vendorName || '',
+//                 productName: i.productName || '',
+//                 billStatus: i.billStatus || '',
+//                 billNo: i.billNo || '',
+//                 qty: i.qty || 0,
+//                 leadTimeToLiftMaterial: (i.leadTimeToLiftMaterial || '') as string | number,
+//                 typeOfBill: i.typeOfBill || '',
+//                 billAmount: i.billAmount || 0,
+//                 discountAmount: i.discountAmount || 0,
+//                 paymentType: i.paymentType || '',
+//                 advanceAmountIfAny: i.advanceAmountIfAny || 0,
+//                 photoOfBill: i.photoOfBill || '',
+//                 transportationInclude: i.transportationInclude || '',
+//                 transporterName: i.transporterName || '',
+//                 amount: i.amount || 0,
+//                 receivingStatus: i.receivingStatus || '',
+//                 receivedQuantity: i.receivedQuantity || 0,
+//                 photoOfProduct: i.photoOfProduct || '',
+//                 warrenty: i.warrenty || '',
+//                 endDateWarrenty: i.endDateWarrenty || '',
+//                 billReceived: i.billReceived || '',
+//                 billNumber: i.billNumber || '',
+//                 billAmount2: i.billAmount2 || '',
+//                 billImage: i.billImage || '',
+//                 damageOrder: i.damageOrder || '',
+//                 quantityAsPerBill: i.quantityAsPerBill || 0,
+//                 priceAsPerPo: i.priceAsPerPo || 0,
+//                 remark: i.remark || '',
+//                 status: i.status || '',
+//                 exchangeQty: (i.exchangeQty || 0) as string | number,
+//                 reason: i.reason || '',
+//                 billNumber2: i.billNumber2 || '',
+//                 planned10: i.planned10 || '',
+//                 actual10: i.actual10 || '',
+//             } as ExchangePendingData))
+//     );
+// }, [storeInSheet]);
+
+// useEffect(() => {
+//     setHistoryData(
+//         storeInSheet
+//             .filter((i) => 
+//                 i.actual10 && i.actual10 !== ''
+//             )
+//             .map((i) => ({
+//                 timestamp: i.timestamp || '',
+//                 liftNumber: i.liftNumber || '',
+//                 indentNo: i.indentNo || '',
+//                 poNumber: i.poNumber || '',
+//                 vendorName: i.vendorName || '',
+//                 productName: i.productName || '',
+//                 billStatus: i.billStatus || '',
+//                 billNo: i.billNo || '',
+//                 qty: i.qty || 0,
+//                 leadTimeToLiftMaterial: (i.leadTimeToLiftMaterial || '') as string | number,
+//                 typeOfBill: i.typeOfBill || '',
+//                 billAmount: i.billAmount || 0,
+//                 discountAmount: i.discountAmount || 0,
+//                 paymentType: i.paymentType || '',
+//                 advanceAmountIfAny: i.advanceAmountIfAny || 0,
+//                 photoOfBill: i.photoOfBill || '',
+//                 transportationInclude: i.transportationInclude || '',
+//                 transporterName: i.transporterName || '',
+//                 amount: i.amount || 0,
+//                 receivingStatus: i.receivingStatus || '',
+//                 receivedQuantity: i.receivedQuantity || 0,
+//                 photoOfProduct: i.photoOfProduct || '',
+//                 warrenty: i.warrenty || '',
+//                 endDateWarrenty: i.endDateWarrenty || '',
+//                 billReceived: i.billReceived || '',
+//                 billNumber: i.billNumber || '',
+//                 billAmount2: i.billAmount2 || '',
+//                 billImage: i.billImage || '',
+//                 damageOrder: i.damageOrder || '',
+//                 quantityAsPerBill: i.quantityAsPerBill || 0,
+//                 priceAsPerPo: i.priceAsPerPo || 0,
+//                 remark: i.remark || '',
+//                 status: i.status || '',
+//                 exchangeQty: (i.exchangeQty || 0) as string | number,
+//                 reason: i.reason || '',
+//                 billNumber2: i.billNumber2 || '',
+//                 planned10: i.planned10 || '',
+//                 actual10: i.actual10 || '',
+//             } as ExchangeHistoryData))
+//     );
+// }, [storeInSheet]);
+
+useEffect(() => {
+    // Pehle firm name se filter karo (case-insensitive)
+    const filteredByFirm = storeInSheet.filter(item => 
+        user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
+    );
+    
     setPendingData(
-        storeInSheet
+        filteredByFirm
             .filter((i) => 
                 i.planned10 && i.planned10 !== '' && 
                 (!i.actual10 || i.actual10 === '')
@@ -168,11 +274,16 @@ const ExchangeMaterials = () => {
                 actual10: i.actual10 || '',
             } as ExchangePendingData))
     );
-}, [storeInSheet]);
+}, [storeInSheet, user.firmNameMatch]);
 
 useEffect(() => {
+    // Pehle firm name se filter karo (case-insensitive)
+    const filteredByFirm = storeInSheet.filter(item => 
+        user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
+    );
+    
     setHistoryData(
-        storeInSheet
+        filteredByFirm
             .filter((i) => 
                 i.actual10 && i.actual10 !== ''
             )
@@ -183,6 +294,7 @@ useEffect(() => {
                 poNumber: i.poNumber || '',
                 vendorName: i.vendorName || '',
                 productName: i.productName || '',
+                firmNameMatch: i.firmNameMatch || '',
                 billStatus: i.billStatus || '',
                 billNo: i.billNo || '',
                 qty: i.qty || 0,
@@ -217,7 +329,7 @@ useEffect(() => {
                 actual10: i.actual10 || '',
             } as ExchangeHistoryData))
     );
-}, [storeInSheet]);
+}, [storeInSheet, user.firmNameMatch]);
 
 useEffect(() => {
     console.log('StoreInSheet data:', storeInSheet);
@@ -253,6 +365,7 @@ useEffect(() => {
         { accessorKey: 'indentNo', header: 'Indent No.' },
         { accessorKey: 'poNumber', header: 'PO Number' },
         { accessorKey: 'vendorName', header: 'Vendor Name' },
+         { accessorKey: 'firmNameMatch', header: 'Firm Name' },
         { accessorKey: 'productName', header: 'Product Name' },
         { accessorKey: 'billStatus', header: 'Bill Status' },
         { accessorKey: 'billNo', header: 'Bill No.' },
@@ -331,6 +444,7 @@ useEffect(() => {
         { accessorKey: 'indentNo', header: 'Indent No.' },
         { accessorKey: 'poNumber', header: 'PO Number' },
         { accessorKey: 'vendorName', header: 'Vendor Name' },
+         { accessorKey: 'firmNameMatch', header: 'Firm Name' },
         { accessorKey: 'productName', header: 'Product Name' },
         { accessorKey: 'billStatus', header: 'Bill Status' },
         { accessorKey: 'billNo', header: 'Bill No.' },

@@ -43,6 +43,7 @@ interface StoreInPendingData {
     transportationInclude: string;
     transporterName: string;
     amount: number;
+    firmNameMatch: string;
 }
 
 interface StoreInHistoryData {
@@ -65,6 +66,7 @@ interface StoreInHistoryData {
     debitNoteCopy: string; // Add this
     billCopy: string; // Add this
     returnCopy: string; // Add this
+    firmNameMatch: string;
 }
 
 export default () => {
@@ -76,9 +78,65 @@ export default () => {
     const [selectedItem, setSelectedItem] = useState<StoreInPendingData | null>(null);
     const [openDialog, setOpenDialog] = useState(false);
 
-   useEffect(() => {
+// useEffect(() => {
+//     setPendingData(
+//         storeInSheet
+//             .filter((i) => i.planned9 !== '' && i.actual9 === '')
+//             .map((i) => ({
+//                 liftNumber: i.liftNumber || '',
+//                 indentNumber: i.indentNo || '',
+//                 billNo: i.billNo || '',
+//                 vendorName: i.vendorName || '',
+//                 productName: i.productName || '',
+//                 qty: i.qty || 0,
+//                 typeOfBill: i.typeOfBill || '',
+//                 billAmount: i.billAmount || 0,
+//                 paymentType: i.paymentType || '',
+//                 advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0, // ✅ ADD Number()
+//                 photoOfBill: i.photoOfBill || '',
+//                 transportationInclude: i.transportationInclude || '',
+//                 transporterName: i.transporterName || '',
+//                 amount: i.amount || 0,
+//             }))
+//     );
+// }, [storeInSheet]);
+
+// useEffect(() => {
+//     setHistoryData(
+//         storeInSheet
+//             .filter((i) => i.planned9 !== '' && i.actual9 !== '')
+//             .map((i) => ({
+//                 liftNumber: i.liftNumber || '',
+//                 indentNumber: i.indentNo || '',
+//                 billNo: i.billNo || '',
+//                 vendorName: i.vendorName || '',
+//                 productName: i.productName || '',
+//                 qty: i.qty || 0,
+//                 typeOfBill: i.typeOfBill || '',
+//                 billAmount: i.billAmount || 0,
+//                 paymentType: i.paymentType || '',
+//                 advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0, // ✅ ADD Number()
+//                 photoOfBill: i.photoOfBill || '',
+//                 transportationInclude: i.transportationInclude || '',
+//                 status: i.status || '',
+//                 reason: i.reason || '',
+//                 billNumber: i.billNo || '',
+//                 statusPurchaser: i.statusPurchaser || '',
+//                 debitNoteCopy: i.debitNoteCopy || '',
+//                 billCopy: i.billCopy || '',
+//                 returnCopy: i.returnCopy || '',
+//             }))
+//     );
+// }, [storeInSheet]);
+
+useEffect(() => {
+    // Pehle firm name se filter karo (case-insensitive)
+    const filteredByFirm = storeInSheet.filter(item => 
+        user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
+    );
+    
     setPendingData(
-        storeInSheet
+        filteredByFirm
             .filter((i) => i.planned9 !== '' && i.actual9 === '')
             .map((i) => ({
                 liftNumber: i.liftNumber || '',
@@ -90,18 +148,24 @@ export default () => {
                 typeOfBill: i.typeOfBill || '',
                 billAmount: i.billAmount || 0,
                 paymentType: i.paymentType || '',
-                advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0, // ✅ ADD Number()
+                advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0,
                 photoOfBill: i.photoOfBill || '',
                 transportationInclude: i.transportationInclude || '',
                 transporterName: i.transporterName || '',
                 amount: i.amount || 0,
+                firmNameMatch: i.firmNameMatch || '',
             }))
     );
-}, [storeInSheet]);
+}, [storeInSheet, user.firmNameMatch]);
 
-   useEffect(() => {
+useEffect(() => {
+    // Pehle firm name se filter karo (case-insensitive)
+    const filteredByFirm = storeInSheet.filter(item => 
+        user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
+    );
+    
     setHistoryData(
-        storeInSheet
+        filteredByFirm
             .filter((i) => i.planned9 !== '' && i.actual9 !== '')
             .map((i) => ({
                 liftNumber: i.liftNumber || '',
@@ -113,7 +177,7 @@ export default () => {
                 typeOfBill: i.typeOfBill || '',
                 billAmount: i.billAmount || 0,
                 paymentType: i.paymentType || '',
-                advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0, // ✅ ADD Number()
+                advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0,
                 photoOfBill: i.photoOfBill || '',
                 transportationInclude: i.transportationInclude || '',
                 status: i.status || '',
@@ -123,9 +187,10 @@ export default () => {
                 debitNoteCopy: i.debitNoteCopy || '',
                 billCopy: i.billCopy || '',
                 returnCopy: i.returnCopy || '',
+                firmNameMatch: i.firmNameMatch || '',
             }))
     );
-}, [storeInSheet]);
+}, [storeInSheet, user.firmNameMatch]);
 
     const pendingColumns: ColumnDef<StoreInPendingData>[] = [
         ...(user.receiveItemView
@@ -153,6 +218,7 @@ export default () => {
             : []),
         { accessorKey: 'liftNumber', header: 'Lift Number' },
         { accessorKey: 'indentNumber', header: 'Indent No.' },
+        { accessorKey: 'firmNameMatch', header: 'Firm Name' }, 
         { accessorKey: 'billNo', header: 'Bill No.' },
         { accessorKey: 'vendorName', header: 'Vendor Name' },
         { accessorKey: 'productName', header: 'Product Name' },
@@ -182,6 +248,7 @@ export default () => {
 
     const historyColumns: ColumnDef<StoreInHistoryData>[] = [
         { accessorKey: 'liftNumber', header: 'Lift Number' },
+        { accessorKey: 'firmNameMatch', header: 'Firm Name' }, 
         { accessorKey: 'indentNumber', header: 'Indent No.' },
         { accessorKey: 'billNo', header: 'Bill No.' },
         { accessorKey: 'vendorName', header: 'Vendor Name' },

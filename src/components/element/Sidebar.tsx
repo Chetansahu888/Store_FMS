@@ -17,11 +17,13 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Logo from './Logo';
 
+
 export default      ({ items }: { items: RouteAttributes[] }) => {
     // console.log("items", items);
     const navigate = useNavigate();
     const { indentSheet, updateAll, allLoading } = useSheets();
     const { user, logout } = useAuth();
+    console.log("user", user);  
 
     // Add Get Purchase item to the existing items
     const allItems = [
@@ -62,7 +64,7 @@ export default      ({ items }: { items: RouteAttributes[] }) => {
             <SidebarContent className="py-1 border-b-1">
                 <SidebarGroup>
                     <SidebarMenu>
-                        {allItems
+                        {/* {allItems
                             .filter((item) =>
                                 item.gateKey ? user[item.gateKey] !== 'No Access' : true
                             )
@@ -85,7 +87,36 @@ export default      ({ items }: { items: RouteAttributes[] }) => {
                                         )}
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
-                            ))}
+                            ))} */}
+
+                            {allItems
+    .filter((item) => {
+        // Agar gateKey hai toh check karo user permission
+        if (item.gateKey) {
+            return user[item.gateKey] === true || user[item.gateKey] === "true";
+        }
+        return true;
+    })
+    .map((item, i) => (
+        <SidebarMenuItem key={i}>
+            <SidebarMenuButton
+                className="transition-colors duration-200 rounded-md py-5 flex justify-between font-medium text-secondary-foreground"
+                onClick={() => navigate(item.path)}
+                isActive={window.location.pathname.slice(1) === item.path}
+            >
+                {' '}
+                <div className="flex gap-2 items-center">
+                    {item.icon}
+                    {item.name}
+                </div>
+                {item.notifications(indentSheet) !== 0 && (
+                    <span className="bg-destructive text-secondary  w-[1.3rem] h-[1.3rem] rounded-full text-xs grid place-items-center text-center">
+                        {item.notifications(indentSheet)}
+                    </span>
+                )}
+            </SidebarMenuButton>
+        </SidebarMenuItem>
+    ))}
                     </SidebarMenu>
                 </SidebarGroup>
             </SidebarContent>

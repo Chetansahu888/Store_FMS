@@ -55,6 +55,7 @@ interface TallyEntryPendingData {
     remarks1: string;
     status2: string;
     remarks2: string;
+    firmNameMatch: string;
 }
 
 interface TallyEntryHistoryData {
@@ -86,6 +87,7 @@ interface TallyEntryHistoryData {
     remarks2: string;
     status3: string;
     remarks3: string;
+    firmNameMatch: string;
 }
 
 export default () => {
@@ -97,76 +99,158 @@ export default () => {
     const [selectedItem, setSelectedItem] = useState<TallyEntryPendingData | null>(null);
     const [openDialog, setOpenDialog] = useState(false);
 
-    useEffect(() => {
-        setPendingData(
-            tallyEntrySheet
-                .filter((i) => i.planned3 !== '' && i.actual3 === '')
-                .map((i) => ({
-                    indentNo: i.indentNo || '',
-                    indentDate: i.indentDate || '',
-                    purchaseDate: i.purchaseDate || '',
-                    materialInDate: i.materialInDate || '',
-                    productName: i.productName || '',
-                    billNo: i.billNo || '',
-                    qty: i.qty || 0,
-                    partyName: i.partyName || '',
-                    billAmt: i.billAmt || 0,
-                    billImage: i.billImage || '',
-                    billReceivedLater: i.billReceivedLater || '',
-                    notReceivedBillNo: i.notReceivedBillNo || '',
-                    location: i.location || '',
-                    typeOfBills: i.typeOfBills || '',
-                    productImage: i.productImage || '',
-                    area: i.area || '',
-                    indentedFor: i.indentedFor || '',
-                    approvedPartyName: i.approvedPartyName || '',
-                    rate: i.rate || 0,
-                    indentQty: i.indentQty || 0,
-                    totalRate: i.totalRate || 0,
+    // useEffect(() => {
+    //     setPendingData(
+    //         tallyEntrySheet
+    //             .filter((i) => i.planned3 !== '' && i.actual3 === '')
+    //             .map((i) => ({
+    //                 indentNo: i.indentNo || '',
+    //                 indentDate: i.indentDate || '',
+    //                 purchaseDate: i.purchaseDate || '',
+    //                 materialInDate: i.materialInDate || '',
+    //                 productName: i.productName || '',
+    //                 billNo: i.billNo || '',
+    //                 qty: i.qty || 0,
+    //                 partyName: i.partyName || '',
+    //                 billAmt: i.billAmt || 0,
+    //                 billImage: i.billImage || '',
+    //                 billReceivedLater: i.billReceivedLater || '',
+    //                 notReceivedBillNo: i.notReceivedBillNo || '',
+    //                 location: i.location || '',
+    //                 typeOfBills: i.typeOfBills || '',
+    //                 productImage: i.productImage || '',
+    //                 area: i.area || '',
+    //                 indentedFor: i.indentedFor || '',
+    //                 approvedPartyName: i.approvedPartyName || '',
+    //                 rate: i.rate || 0,
+    //                 indentQty: i.indentQty || 0,
+    //                 totalRate: i.totalRate || 0,
 
-                    status1: i.status1 || '',
-                    remarks1: i.remarks1 || '',
-                    status2: i.status2 || '',
-                    remarks2: i.remarks2 || '',
-                }))
-        );
-    }, [tallyEntrySheet]);
+    //                 status1: i.status1 || '',
+    //                 remarks1: i.remarks1 || '',
+    //                 status2: i.status2 || '',
+    //                 remarks2: i.remarks2 || '',
+    //             }))
+    //     );
+    // }, [tallyEntrySheet]);
+
+    // useEffect(() => {
+    //     setHistoryData(
+    //         tallyEntrySheet
+    //             .filter((i) => i.planned3 !== '' && i.actual3 !== '')
+    //             .map((i) => ({
+    //                 indentNo: i.indentNo || '',
+    //                 indentDate: i.indentDate || '',
+    //                 purchaseDate: i.purchaseDate || '',
+    //                 materialInDate: i.materialInDate || '',
+    //                 productName: i.productName || '',
+    //                 billNo: i.billNo || '',
+    //                 qty: i.qty || 0,
+    //                 partyName: i.partyName || '',
+    //                 billAmt: i.billAmt || 0,
+    //                 billImage: i.billImage || '',
+    //                 billReceivedLater: i.billReceivedLater || '',
+    //                 notReceivedBillNo: i.notReceivedBillNo || '',
+    //                 location: i.location || '',
+    //                 typeOfBills: i.typeOfBills || '',
+    //                 productImage: i.productImage || '',
+    //                 area: i.area || '',
+    //                 indentedFor: i.indentedFor || '',
+    //                 approvedPartyName: i.approvedPartyName || '',
+    //                 rate: i.rate || 0,
+    //                 indentQty: i.indentQty || 0,
+    //                 totalRate: i.totalRate || 0,
+    //                 status1: i.status1 || '',
+    //                 remarks1: i.remarks1 || '',
+    //                 status2: i.status2 || '',
+    //                 remarks2: i.remarks2 || '',
+    //                 status3: i.status3 || '',
+    //                 remarks3: i.remarks3 || '',
+    //             }))
+    //     );
+    // }, [tallyEntrySheet]);
 
     useEffect(() => {
-        setHistoryData(
-            tallyEntrySheet
-                .filter((i) => i.planned3 !== '' && i.actual3 !== '')
-                .map((i) => ({
-                    indentNo: i.indentNo || '',
-                    indentDate: i.indentDate || '',
-                    purchaseDate: i.purchaseDate || '',
-                    materialInDate: i.materialInDate || '',
-                    productName: i.productName || '',
-                    billNo: i.billNo || '',
-                    qty: i.qty || 0,
-                    partyName: i.partyName || '',
-                    billAmt: i.billAmt || 0,
-                    billImage: i.billImage || '',
-                    billReceivedLater: i.billReceivedLater || '',
-                    notReceivedBillNo: i.notReceivedBillNo || '',
-                    location: i.location || '',
-                    typeOfBills: i.typeOfBills || '',
-                    productImage: i.productImage || '',
-                    area: i.area || '',
-                    indentedFor: i.indentedFor || '',
-                    approvedPartyName: i.approvedPartyName || '',
-                    rate: i.rate || 0,
-                    indentQty: i.indentQty || 0,
-                    totalRate: i.totalRate || 0,
-                    status1: i.status1 || '',
-                    remarks1: i.remarks1 || '',
-                    status2: i.status2 || '',
-                    remarks2: i.remarks2 || '',
-                    status3: i.status3 || '',
-                    remarks3: i.remarks3 || '',
-                }))
-        );
-    }, [tallyEntrySheet]);
+    // Pehle firm name se filter karo (case-insensitive)
+    const filteredByFirm = tallyEntrySheet.filter(item => 
+        user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
+    );
+    
+    setPendingData(
+        filteredByFirm
+            .filter((i) => i.planned3 !== '' && i.actual3 === '')
+            .map((i) => ({
+                indentNo: i.indentNo || '',
+                indentDate: i.indentDate || '',
+                purchaseDate: i.purchaseDate || '',
+                materialInDate: i.materialInDate || '',
+                productName: i.productName || '',
+                billNo: i.billNo || '',
+                qty: i.qty || 0,
+                partyName: i.partyName || '',
+                billAmt: i.billAmt || 0,
+                billImage: i.billImage || '',
+                billReceivedLater: i.billReceivedLater || '',
+                notReceivedBillNo: i.notReceivedBillNo || '',
+                location: i.location || '',
+                typeOfBills: i.typeOfBills || '',
+                productImage: i.productImage || '',
+                area: i.area || '',
+                indentedFor: i.indentedFor || '',
+                approvedPartyName: i.approvedPartyName || '',
+                rate: i.rate || 0,
+                indentQty: i.indentQty || 0,
+                totalRate: i.totalRate || 0,
+                status1: i.status1 || '',
+                remarks1: i.remarks1 || '',
+                status2: i.status2 || '',
+                remarks2: i.remarks2 || '',
+                firmNameMatch: i.firmNameMatch || '',
+            }))
+    );
+}, [tallyEntrySheet, user.firmNameMatch]);
+
+useEffect(() => {
+    // Pehle firm name se filter karo (case-insensitive)
+    const filteredByFirm = tallyEntrySheet.filter(item => 
+        user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
+    );
+    
+    setHistoryData(
+        filteredByFirm
+            .filter((i) => i.planned3 !== '' && i.actual3 !== '')
+            .map((i) => ({
+                indentNo: i.indentNo || '',
+                indentDate: i.indentDate || '',
+                purchaseDate: i.purchaseDate || '',
+                materialInDate: i.materialInDate || '',
+                productName: i.productName || '',
+                billNo: i.billNo || '',
+                qty: i.qty || 0,
+                partyName: i.partyName || '',
+                billAmt: i.billAmt || 0,
+                billImage: i.billImage || '',
+                billReceivedLater: i.billReceivedLater || '',
+                notReceivedBillNo: i.notReceivedBillNo || '',
+                location: i.location || '',
+                typeOfBills: i.typeOfBills || '',
+                productImage: i.productImage || '',
+                area: i.area || '',
+                indentedFor: i.indentedFor || '',
+                approvedPartyName: i.approvedPartyName || '',
+                rate: i.rate || 0,
+                indentQty: i.indentQty || 0,
+                totalRate: i.totalRate || 0,
+                status1: i.status1 || '',
+                remarks1: i.remarks1 || '',
+                status2: i.status2 || '',
+                remarks2: i.remarks2 || '',
+                status3: i.status3 || '',
+                remarks3: i.remarks3 || '',
+                firmNameMatch: i.firmNameMatch || '',
+            }))
+    );
+}, [tallyEntrySheet, user.firmNameMatch]);
 
 
     const formatDate = (dateString: string) => {
@@ -220,6 +304,7 @@ export default () => {
 },
         { accessorKey: 'productName', header: 'Product Name' },
         { accessorKey: 'billNo', header: 'Bill No.' },
+          { accessorKey: 'firmNameMatch', header: 'Firm Name' }, 
         { accessorKey: 'qty', header: 'Qty' },
         { accessorKey: 'partyName', header: 'Party Name' },
         { accessorKey: 'billAmt', header: 'Bill Amt' },
@@ -274,6 +359,7 @@ export default () => {
     header: 'Indent Date',
     cell: ({ row }) => formatDate(row.original.indentDate)
 },
+  { accessorKey: 'firmNameMatch', header: 'Firm Name' }, 
 { 
     accessorKey: 'purchaseDate', 
     header: 'Purchase Date',

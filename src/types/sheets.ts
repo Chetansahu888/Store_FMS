@@ -82,6 +82,7 @@ export type IndentSheet = {
     liftingStatus: string;
     // pendingLiftQty: number;
     pendingLiftQty: number
+    firmNameMatch: string;
 
 
 };
@@ -165,6 +166,7 @@ export type PoMasterSheet = {
     term10: string;
     deliveryDays: number;
     deliveryType: string;
+    firmNameMatch: string;
 
 };
 
@@ -219,6 +221,7 @@ export type UserPermissions = {
     poMaster: boolean;
     getPurchase: boolean;
     storeIssue: boolean;
+    firmNameMatch: string;
 };
 
 export const allPermissionKeys = [
@@ -352,7 +355,11 @@ export type StoreInSheet = {
     vehicleNo: string;
     driverName: string;
     driverMobileNo: string;
+    billImageStatus: string;
 
+    billRemark: string;
+
+    firmNameMatch: string;
     
 }
 
@@ -408,14 +415,21 @@ export type TallyEntrySheet = {
     actual5: string;
     status5: string;
     rowIndex: string;
+    firmNameMatch: string;
 };
 
 export type PcReportSheet = {
     stage: string;
-    firmName: string;
+    firmName?: string;
     totalPending: number | string;
     totalComplete: number | string;
+    firmNameMatch?: string;
+    pendingPmpl: string | number;
+    pendingPurab: string | number;
+    pendingPmmpl: string | number;
+    pendingRefrasynth: string | number;
 };
+
 
 export type FullkittingSheet = {
     rowIndex?: number;
@@ -434,7 +448,7 @@ export type FullkittingSheet = {
     planned: string;
     actual: string;
     timeDelay: string;
-    fmsName?: string;
+    fmsName: string;
     status?: string;
     vehicleNumber?: string;
     from?: string;
@@ -444,4 +458,5 @@ export type FullkittingSheet = {
     rateType?: string;
     amount1: number;
     biltyImage?: string;
+    firmNameMatch: string;
 };

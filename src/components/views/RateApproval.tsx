@@ -57,47 +57,105 @@ export default () => {
     const [openDialog, setOpenDialog] = useState(false);
 
     // Fetching table data
-    useEffect(() => {
-        setTableData(
-            indentSheet
-                .filter(
-                    (sheet) =>
-                        sheet.planned3 !== '' &&
-                        sheet.actual3 === '' &&
-                        sheet.vendorType === 'Three Party'
-                )
-                .map((sheet) => ({
-                    indentNo: sheet.indentNumber,
-                    indenter: sheet.indenterName,
-                    department: sheet.department,
-                    product: sheet.productName,
-                    comparisonSheet: sheet.comparisonSheet || '',
-                    date: formatDate(new Date(sheet.timestamp)),
-                    vendors: [
-                        [sheet.vendorName1, sheet.rate1.toString(), sheet.paymentTerm1],
-                        [sheet.vendorName2, sheet.rate2.toString(), sheet.paymentTerm2],
-                        [sheet.vendorName3, sheet.rate3.toString(), sheet.paymentTerm3],
-                    ],
-                }))
-        );
-        setHistoryData(
-            indentSheet
-                .filter(
-                    (sheet) =>
-                        sheet.planned3 !== '' &&
-                        sheet.actual3 !== '' &&
-                        sheet.vendorType === 'Three Party'
-                )
-                .map((sheet) => ({
-                    indentNo: sheet.indentNumber,
-                    indenter: sheet.indenterName,
-                    department: sheet.department,
-                    product: sheet.productName,
-                    date: new Date(sheet.timestamp).toDateString(),
-                    vendor: [sheet.approvedVendorName, sheet.approvedRate.toString()],
-                }))
-        );
-    }, [indentSheet]);
+    // useEffect(() => {
+    //     setTableData(
+    //         indentSheet
+    //             .filter(
+    //                 (sheet) =>
+    //                     sheet.planned3 !== '' &&
+    //                     sheet.actual3 === '' &&
+    //                     sheet.vendorType === 'Three Party'
+    //             )
+    //             .map((sheet) => ({
+    //                 indentNo: sheet.indentNumber,
+    //                 indenter: sheet.indenterName,
+    //                 department: sheet.department,
+    //                 product: sheet.productName,
+    //                 comparisonSheet: sheet.comparisonSheet || '',
+    //                 date: formatDate(new Date(sheet.timestamp)),
+    //                 vendors: [
+    //                     [sheet.vendorName1, sheet.rate1.toString(), sheet.paymentTerm1],
+    //                     [sheet.vendorName2, sheet.rate2.toString(), sheet.paymentTerm2],
+    //                     [sheet.vendorName3, sheet.rate3.toString(), sheet.paymentTerm3],
+    //                 ],
+    //             }))
+    //     );
+    //     setHistoryData(
+    //         indentSheet
+    //             .filter(
+    //                 (sheet) =>
+    //                     sheet.planned3 !== '' &&
+    //                     sheet.actual3 !== '' &&
+    //                     sheet.vendorType === 'Three Party'
+    //             )
+    //             .map((sheet) => ({
+    //                 indentNo: sheet.indentNumber,
+    //                 indenter: sheet.indenterName,
+    //                 department: sheet.department,
+    //                 product: sheet.productName,
+    //                 date: new Date(sheet.timestamp).toDateString(),
+    //                 vendor: [sheet.approvedVendorName, sheet.approvedRate.toString()],
+    //             }))
+    //     );
+    // }, [indentSheet]);
+
+    // Fetching table data
+useEffect(() => {
+    // Pehle firm name se filter karo (case-insensitive)
+    const filteredByFirm = indentSheet.filter(sheet => 
+        user.firmNameMatch.toLowerCase() === "all" || sheet.firmName === user.firmNameMatch
+    );
+    
+    setTableData(
+        filteredByFirm
+            .filter(
+                (sheet) =>
+                    sheet.planned3 !== '' &&
+                    sheet.actual3 === '' &&
+                    sheet.vendorType === 'Three Party'
+            )
+            .map((sheet) => ({
+                indentNo: sheet.indentNumber,
+                firmNameMatch: sheet.firmNameMatch || '',
+                indenter: sheet.indenterName,
+                department: sheet.department,
+                product: sheet.productName,
+                comparisonSheet: sheet.comparisonSheet || '',
+                date: formatDate(new Date(sheet.timestamp)),
+                vendors: [
+                    [sheet.vendorName1, sheet.rate1.toString(), sheet.paymentTerm1],
+                    [sheet.vendorName2, sheet.rate2.toString(), sheet.paymentTerm2],
+                    [sheet.vendorName3, sheet.rate3.toString(), sheet.paymentTerm3],
+                ],
+            }))
+    );
+}, [indentSheet, user.firmNameMatch]);
+
+useEffect(() => {
+    // Pehle firm name se filter karo (case-insensitive)
+    const filteredByFirm = indentSheet.filter(sheet => 
+        user.firmNameMatch.toLowerCase() === "all" || sheet.firmName === user.firmNameMatch
+    );
+    
+    setHistoryData(
+        filteredByFirm
+            .filter(
+                (sheet) =>
+                    sheet.planned3 !== '' &&
+                    sheet.actual3 !== '' &&
+                    sheet.vendorType === 'Three Party'
+            )
+            .map((sheet) => ({
+                indentNo: sheet.indentNumber,
+                firmNameMatch: sheet.firmNameMatch || '',
+                indenter: sheet.indenterName,
+                department: sheet.department,
+                product: sheet.productName,
+                date: new Date(sheet.timestamp).toDateString(),
+                vendor: [sheet.approvedVendorName, sheet.approvedRate.toString()],
+            }))
+    );
+}, [indentSheet, user.firmNameMatch]);
 
     // Creating table columns
     const columns: ColumnDef<RateApprovalData>[] = [
@@ -128,6 +186,7 @@ export default () => {
             ]
             : []),
         { accessorKey: 'indentNo', header: 'Indent No.' },
+        { accessorKey: 'firmNameMatch', header: 'Firm Name' },
         { accessorKey: 'indenter', header: 'Indenter' },
         { accessorKey: 'department', header: 'Department' },
         { accessorKey: 'product', header: 'Product' },
@@ -192,6 +251,7 @@ export default () => {
             },
         ] : []),
         { accessorKey: 'indentNo', header: 'Indent No.' },
+        { accessorKey: 'firmNameMatch', header: ' Firm Name' },
         { accessorKey: 'indenter', header: 'Indenter' },
         { accessorKey: 'department', header: 'Department' },
         { accessorKey: 'product', header: 'Product' },
@@ -327,7 +387,7 @@ async function onSubmit(values: z.infer<typeof schema>) {
                         <DataTable
                             data={tableData}
                             columns={columns}
-                            searchFields={['product', 'department', 'indenter']}
+                            searchFields={['product', 'department', 'indenter' ,'firmNameMatch']}
                             dataLoading={indentLoading}
                         />
                     </TabsContent>
@@ -335,7 +395,7 @@ async function onSubmit(values: z.infer<typeof schema>) {
                         <DataTable
                             data={historyData}
                             columns={historyColumns}
-                            searchFields={['product', 'department', 'indenter']}
+                            searchFields={['product', 'department', 'indenter','firmNameMatch']}
                             dataLoading={indentLoading}
                         />
                     </TabsContent>

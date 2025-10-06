@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import type { ColumnDef, Row } from '@tanstack/react-table';
 import DataTable from '../element/DataTable';
 import type { TallyEntrySheet } from '@/types';
+import { useAuth } from '@/context/AuthContext';
+
 import { Button } from '../ui/button';
 import {
   Dialog,
@@ -35,15 +37,39 @@ export default function PcReportTable() {
   const [data, setData] = useState<TallyEntrySheet[]>([]);
   const [selectedRow, setSelectedRow] = useState<TallyEntrySheet | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
+      const { user } = useAuth();
+  
+  
+  // Update table data whenever tallyEntrySheet changes
+  // useEffect(() => {
+  //   if (!tallyEntrySheet) return;
+    
+  //   console.log("Raw Tally Entry Sheet:", tallyEntrySheet);
+    
+  //   // Filter the data according to planned5 has value and actual5 is empty/null
+  //   const filteredData = tallyEntrySheet.filter(
+  //     (row) => 
+  //       (row.planned5 !== null && row.planned5 !== undefined && row.planned5 !== '') && 
+  //       (row.actual5 === null || row.actual5 === undefined || row.actual5 === '')
+  //   );
+
+  //   console.log("Filtered Tally Entry Sheet:", filteredData);
+  //   setData(filteredData);
+  // }, [tallyEntrySheet]);
 
   // Update table data whenever tallyEntrySheet changes
-  useEffect(() => {
+useEffect(() => {
     if (!tallyEntrySheet) return;
     
     console.log("Raw Tally Entry Sheet:", tallyEntrySheet);
     
+    // Pehle firm name se filter karo (case-insensitive)
+    const filteredByFirm = tallyEntrySheet.filter(item => 
+        user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
+    );
+    
     // Filter the data according to planned5 has value and actual5 is empty/null
-    const filteredData = tallyEntrySheet.filter(
+    const filteredData = filteredByFirm.filter(
       (row) => 
         (row.planned5 !== null && row.planned5 !== undefined && row.planned5 !== '') && 
         (row.actual5 === null || row.actual5 === undefined || row.actual5 === '')
@@ -51,7 +77,7 @@ export default function PcReportTable() {
 
     console.log("Filtered Tally Entry Sheet:", filteredData);
     setData(filteredData);
-  }, [tallyEntrySheet]);
+}, [tallyEntrySheet, user.firmNameMatch]);
 
   // Reset form when dialog closes
   useEffect(() => {
@@ -140,6 +166,7 @@ export default function PcReportTable() {
   { accessorKey: 'purchaseDate', header: 'Purchase Date' },
   { accessorKey: 'materialInDate', header: 'Material In Date' },
   { accessorKey: 'productName', header: 'Product Name' },
+   { accessorKey: 'firmNameMatch', header: 'Firm Name' }, 
   { accessorKey: 'billNo', header: 'Bill No' },
   { accessorKey: 'qty', header: 'Quantity' },
   { accessorKey: 'partyName', header: 'Party Name' },

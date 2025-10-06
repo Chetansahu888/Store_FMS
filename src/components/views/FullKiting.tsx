@@ -6,6 +6,7 @@ import DataTable from '../element/DataTable';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useAuth } from '@/context/AuthContext';
 
 import {
     Dialog,
@@ -37,6 +38,7 @@ interface FullkittingData {
     transportingInclude: string;
     transporterName: string;
     amount: number;
+    firmNameMatch: string;
 }
 
 export default function FullKitting() {
@@ -46,13 +48,37 @@ export default function FullKitting() {
     const [openDialog, setOpenDialog] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { masterSheet } = useSheets();
+    const { user } = useAuth();
 
 
+    // useEffect(() => {
+    //     console.log("Fullkitting Sheet:", fullkittingSheet);
+    //     setTableData(
+    //         fullkittingSheet
+    //             .filter((item) => item.planned && item.planned !== '' && (!item.actual || item.actual === ''))
+    //             .map((item) => ({
+    //                 indentNumber: item.indentNumber || '',
+    //                 vendorName: item.vendorName || '',
+    //                 productName: item.productName || '',
+    //                 qty: item.qty || 0,
+    //                 billNo: item.billNo || '',
+    //                 transportingInclude: item.transportingInclude || '',
+    //                 transporterName: item.transporterName || '',
+    //                 amount: item.amount || 0,
+    //             }))
+    //     );
+    // }, [fullkittingSheet]);
 
     useEffect(() => {
         console.log("Fullkitting Sheet:", fullkittingSheet);
+        
+        // Pehle firm name se filter karo (case-insensitive)
+        const filteredByFirm = fullkittingSheet.filter(item => 
+            user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
+        );
+        
         setTableData(
-            fullkittingSheet
+            filteredByFirm
                 .filter((item) => item.planned && item.planned !== '' && (!item.actual || item.actual === ''))
                 .map((item) => ({
                     indentNumber: item.indentNumber || '',
@@ -63,9 +89,10 @@ export default function FullKitting() {
                     transportingInclude: item.transportingInclude || '',
                     transporterName: item.transporterName || '',
                     amount: item.amount || 0,
+                    firmNameMatch: item.firmNameMatch || '',
                 }))
         );
-    }, [fullkittingSheet]);
+    }, [fullkittingSheet, user.firmNameMatch]);
 
     const columns: ColumnDef<FullkittingData>[] = [
         {
@@ -87,6 +114,7 @@ export default function FullKitting() {
             },
         },
         { accessorKey: 'indentNumber', header: 'Indent Number' },
+         { accessorKey: 'firmNameMatch', header: 'Firm Name Match' }, 
         { accessorKey: 'vendorName', header: 'Vendor Name' },
         { accessorKey: 'productName', header: 'Product Name' },
         { accessorKey: 'qty', header: 'Qty' },
@@ -202,7 +230,7 @@ export default function FullKitting() {
                 <DataTable
                     data={tableData}
                     columns={columns}
-                    searchFields={['indentNumber', 'productName', 'vendorName']}
+                    searchFields={['indentNumber', 'productName', 'vendorName','firmNameMatch']}
                     dataLoading={fullkittingLoading}
                 />
 

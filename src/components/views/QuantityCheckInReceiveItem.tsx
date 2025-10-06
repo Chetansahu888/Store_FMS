@@ -43,6 +43,7 @@ interface StoreInPendingData {
     transportationInclude: string;
     transporterName: string;
     amount: number;
+     firmNameMatch: string;
 }
 
 interface StoreInHistoryData {
@@ -61,6 +62,7 @@ interface StoreInHistoryData {
     status: string;
     reason: string;
     billNumber: string;
+     firmNameMatch: string;
 }
 
 export default () => {
@@ -71,10 +73,75 @@ export default () => {
     const [historyData, setHistoryData] = useState<StoreInHistoryData[]>([]);
     const [selectedItem, setSelectedItem] = useState<StoreInPendingData | null>(null);
     const [openDialog, setOpenDialog] = useState(false);
+    
 
-   useEffect(() => {
+// useEffect(() => {
+//     setPendingData(
+//         storeInSheet
+//             .filter((i) => i.planned7 !== '' && i.actual7 === '')
+//             .map((i) => ({
+//                 liftNumber: i.liftNumber || '',
+//                 indentNumber: i.indentNo || '',
+//                 billNo: i.billNo || '',
+//                 vendorName: i.vendorName || '',
+//                 productName: i.productName || '',
+//                 qty: i.qty || 0,
+//                 typeOfBill: i.typeOfBill || '',
+//                 billAmount: i.billAmount || 0,
+//                 paymentType: i.paymentType || '',
+//                 advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0, // ✅ ADD Number()
+//                 photoOfBill: i.photoOfBill || '',
+//                 transportationInclude: i.transportationInclude || '',
+//                 transporterName: i.transporterName || '',
+//                 amount: i.amount || 0,
+
+//                 damageOrder: i.damageOrder || '',
+//     quantityAsPerBill: i.quantityAsPerBill || 0,
+//     priceAsPerPo: i.priceAsPerPo || 0,
+//     remark: i.remark || '',
+//             }))
+//     );
+// }, [storeInSheet]);
+
+
+//     useEffect(() => {
+//     setHistoryData(
+//         storeInSheet
+//             .filter((i) => i.planned7 !== '' && i.actual7 !== '')
+//             .map((i) => ({
+//                 liftNumber: i.liftNumber || '',
+//                 indentNumber: i.indentNo || '',
+//                 billNo: i.billNo || '',
+//                 vendorName: i.vendorName || '',
+//                 productName: i.productName || '',
+//                 qty: i.qty || 0,
+//                 typeOfBill: i.typeOfBill || '',
+//                 billAmount: i.billAmount || 0,
+//                 paymentType: i.paymentType || '',
+//                 advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0, // ✅ ADD Number()
+//                 photoOfBill: i.photoOfBill || '',
+//                 transportationInclude: i.transportationInclude || '',
+//                 status: i.status || '',
+//                 reason: i.reason || '',
+//                 billNumber: i.billNo || '',
+
+//                 damageOrder: i.damageOrder || '',
+//     quantityAsPerBill: i.quantityAsPerBill || 0,
+//     priceAsPerPo: i.priceAsPerPo || 0,
+//     remark: i.remark || '',
+//             }))
+//     );
+// }, [storeInSheet]);
+
+
+useEffect(() => {
+    // Pehle firm name se filter karo
+    const filteredByFirm = storeInSheet.filter(item => 
+        user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
+    );
+    
     setPendingData(
-        storeInSheet
+        filteredByFirm
             .filter((i) => i.planned7 !== '' && i.actual7 === '')
             .map((i) => ({
                 liftNumber: i.liftNumber || '',
@@ -86,23 +153,28 @@ export default () => {
                 typeOfBill: i.typeOfBill || '',
                 billAmount: i.billAmount || 0,
                 paymentType: i.paymentType || '',
-                advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0, // ✅ ADD Number()
+                advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0,
                 photoOfBill: i.photoOfBill || '',
                 transportationInclude: i.transportationInclude || '',
                 transporterName: i.transporterName || '',
                 amount: i.amount || 0,
-
                 damageOrder: i.damageOrder || '',
-    quantityAsPerBill: i.quantityAsPerBill || 0,
-    priceAsPerPo: i.priceAsPerPo || 0,
-    remark: i.remark || '',
+                quantityAsPerBill: i.quantityAsPerBill || 0,
+                priceAsPerPo: i.priceAsPerPo || 0,
+                remark: i.remark || '',
+                firmNameMatch: i.firmNameMatch || '',
             }))
     );
-}, [storeInSheet]);
+}, [storeInSheet, user.firmNameMatch]);
 
-    useEffect(() => {
+useEffect(() => {
+    // Pehle firm name se filter karo
+    const filteredByFirm = storeInSheet.filter(item => 
+        user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
+    );
+    
     setHistoryData(
-        storeInSheet
+        filteredByFirm
             .filter((i) => i.planned7 !== '' && i.actual7 !== '')
             .map((i) => ({
                 liftNumber: i.liftNumber || '',
@@ -114,20 +186,20 @@ export default () => {
                 typeOfBill: i.typeOfBill || '',
                 billAmount: i.billAmount || 0,
                 paymentType: i.paymentType || '',
-                advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0, // ✅ ADD Number()
+                advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0,
                 photoOfBill: i.photoOfBill || '',
                 transportationInclude: i.transportationInclude || '',
                 status: i.status || '',
                 reason: i.reason || '',
                 billNumber: i.billNo || '',
-
                 damageOrder: i.damageOrder || '',
-    quantityAsPerBill: i.quantityAsPerBill || 0,
-    priceAsPerPo: i.priceAsPerPo || 0,
-    remark: i.remark || '',
+                quantityAsPerBill: i.quantityAsPerBill || 0,
+                priceAsPerPo: i.priceAsPerPo || 0,
+                remark: i.remark || '',
+                firmNameMatch: i.firmNameMatch || '',
             }))
     );
-}, [storeInSheet]);
+}, [storeInSheet, user.firmNameMatch]);
 
     const pendingColumns: ColumnDef<StoreInPendingData>[] = [
         ...(user.receiveItemView
@@ -157,6 +229,7 @@ export default () => {
         { accessorKey: 'indentNumber', header: 'Indent No.' },
         { accessorKey: 'billNo', header: 'Bill No.' },
         { accessorKey: 'vendorName', header: 'Vendor Name' },
+        { accessorKey: 'firmNameMatch', header: 'Firm Name' },
         { accessorKey: 'productName', header: 'Product Name' },
         { accessorKey: 'qty', header: 'Qty' },
         { accessorKey: 'typeOfBill', header: 'Type Of Bill' },
@@ -193,6 +266,7 @@ export default () => {
         { accessorKey: 'indentNumber', header: 'Indent No.' },
         { accessorKey: 'billNo', header: 'Bill No.' },
         { accessorKey: 'vendorName', header: 'Vendor Name' },
+        { accessorKey: 'firmNameMatch', header: 'Firm Name' },
         { accessorKey: 'productName', header: 'Product Name' },
         { accessorKey: 'qty', header: 'Qty' },
         { accessorKey: 'typeOfBill', header: 'Type Of Bill' },

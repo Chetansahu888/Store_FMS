@@ -152,7 +152,7 @@ export default () => {
         deliveryDate: z.coerce.date(),
         deliveryDays: z.coerce.number().optional(), // NEW FIELD
         deliveryType: z.enum(['for', 'exfactory']).optional(), // NEW FIELD
-        paymentTerms: z.enum([ 'Party PI', 'Advance', 'After Delivery']),
+        paymentTerms: z.enum([ 'Party PI / Party Advance', 'Advance', 'After Delivery']),
         numberOfDays: z.coerce.number().optional(),
     });
 
@@ -988,11 +988,12 @@ export default () => {
                                                     </FormControl>
                                                     <SelectContent>
                                                         
-                                                        <SelectItem value="Party PI">
-                                                            Party PI
-                                                        </SelectItem>
+                                                       
                                                         <SelectItem value="Advance">
                                                             Advance
+                                                        </SelectItem>
+                                                         <SelectItem value="Party PI / Party Advance">
+                                                            Party PI / Party Advance
                                                         </SelectItem>
                                                         <SelectItem value="After Delivery">
                                                             After Delivery
@@ -1509,7 +1510,7 @@ export default () => {
                                         </FormItem>
                                     )}
                                 /> */}
-                                <p className="break-words min-w-1/4">For {details?.companyName}</p>
+                                {/* <p className="break-words min-w-1/4">For {details?.companyName}</p> */}
                             </div>
                         </div>
 

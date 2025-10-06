@@ -59,6 +59,7 @@ interface StoreInPendingData {
     billStatus: string;
     leadTimeToLiftMaterial: number;
     discountAmount: number;
+    firmNameMatch: string;
 }
 
 interface StoreInHistoryData {
@@ -106,6 +107,7 @@ interface StoreInHistoryData {
     warrantyEndDate: string;
     billReceived: string;
     billImage: string;
+    firmNameMatch: string;
 }
 
 // Fix type names to match usage
@@ -129,90 +131,184 @@ export default () => {
     const [indentLoading, setIndentLoading] = useState(false);
     const [receivedLoading, setReceivedLoading] = useState(false);
 
-    useEffect(() => {
-        setTableData(
-            storeInSheet
-                .filter((i) => i.planned6 !== '' && i.actual6 === '')
-                .map((i) => ({
-                    liftNumber: i.liftNumber || '',
-                    indentNo: i.indentNo || '',
-                    billNo: String(i.billNo) || '',
-                    vendorName: i.vendorName || '',
-                    productName: i.productName || '',
-                    qty: i.qty || 0,
-                    typeOfBill: i.typeOfBill || '',
-                    billAmount: i.billAmount || 0,
-                    paymentType: i.paymentType || '',
-                    advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0, // ✅ ADD Number()
-                    photoOfBill: i.photoOfBill || '',
-                    transportationInclude: i.transportationInclude || '',
-                    transporterName: i.transporterName || '',
-                    amount: i.amount || 0,
-                    // Add missing mapped properties
-                    poDate: i.poDate || '',
-                    poNumber: i.poNumber || '',
-                    vendor: i.vendor || '',
-                    indentNumber: i.indentNumber || '',
-                    product: i.product || '',
-                    uom: i.uom || '',
-                    // qty: i.qty || 0,
-                    poCopy: i.poCopy || '',
-                    billStatus: i.billStatus || '',
-                    leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
-                    discountAmount: i.discountAmount || 0,
-                }))
-        );
-    }, [storeInSheet]);
+    // useEffect(() => {
+    //     setTableData(
+    //         storeInSheet
+    //             .filter((i) => i.planned6 !== '' && i.actual6 === '')
+    //             .map((i) => ({
+    //                 liftNumber: i.liftNumber || '',
+    //                 indentNo: i.indentNo || '',
+    //                 billNo: String(i.billNo) || '',
+    //                 vendorName: i.vendorName || '',
+    //                 productName: i.productName || '',
+    //                 qty: i.qty || 0,
+    //                 typeOfBill: i.typeOfBill || '',
+    //                 billAmount: i.billAmount || 0,
+    //                 paymentType: i.paymentType || '',
+    //                 advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0, // ✅ ADD Number()
+    //                 photoOfBill: i.photoOfBill || '',
+    //                 transportationInclude: i.transportationInclude || '',
+    //                 transporterName: i.transporterName || '',
+    //                 amount: i.amount || 0,
+    //                 // Add missing mapped properties
+    //                 poDate: i.poDate || '',
+    //                 poNumber: i.poNumber || '',
+    //                 vendor: i.vendor || '',
+    //                 indentNumber: i.indentNumber || '',
+    //                 product: i.product || '',
+    //                 uom: i.uom || '',
+    //                 // qty: i.qty || 0,
+    //                 poCopy: i.poCopy || '',
+    //                 billStatus: i.billStatus || '',
+    //                 leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
+    //                 discountAmount: i.discountAmount || 0,
+    //             }))
+    //     );
+    // }, [storeInSheet]);
 
-    useEffect(() => {
-        setHistoryData(
-            storeInSheet
-                .filter((i) => i.actual6 !== '')
-                .map((i) => ({
-                    liftNumber: i.liftNumber || '',
-                    indentNo: i.indentNo || '',
-                    billNo: String(i.billNo) || '',
-                    vendorName: i.vendorName || '',
-                    productName: i.productName || '',
-                    qty: i.qty || 0,
-                    typeOfBill: i.typeOfBill || '',
-                    billAmount: i.billAmount || 0,
-                    paymentType: i.paymentType || '',
-                    advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0, // ✅ ADD Number()
-                    photoOfBill: i.photoOfBill || '',
-                    transportationInclude: i.transportationInclude || '',
-                    transporterName: i.transporterName || '',
-                    amount: i.amount || 0,
-                    billStatus: i.billStatus || '',
-                    receivedQuantity: i.receivedQuantity || 0,
-                    photoOfProduct: i.photoOfProduct || '',
-                    unitOfMeasurement: i.unitOfMeasurement || '',
-                    damageOrder: i.damageOrder || '',
-                    quantityAsPerBill: i.quantityAsPerBill || 0,
-                    priceAsPerPo: i.priceAsPerPo || 0,
-                    remark: i.remark || '',
-                    // Map from existing StoreInSheet properties or set defaults
-                    poDate: '', // This doesn't exist in StoreInSheet
-                    poNumber: '', // This doesn't exist in StoreInSheet
-                    receiveStatus: i.status || '', // Map from 'status' field
-                    vendor: i.vendorName || '', // Map from vendorName
-                    product: i.productName || '', // Map from productName
-                    orderQuantity: i.qty || 0, // Map from qty
-                    receivedDate: i.timestamp || '', // Map from timestamp or set default
-                    warrantyStatus: '', // This doesn't exist in StoreInSheet
-                    warrantyEndDate: '', // This doesn't exist in StoreInSheet
-                    billNumber: i.billNumber || '', // This exists in StoreInSheet
-                    anyTransport: i.transportationInclude || '', // Map from transportationInclude
-                    transportingAmount: i.amount || 0, // Map from amount or set default
+    // useEffect(() => {
+    //     setHistoryData(
+    //         storeInSheet
+    //             .filter((i) => i.actual6 !== '')
+    //             .map((i) => ({
+    //                 liftNumber: i.liftNumber || '',
+    //                 indentNo: i.indentNo || '',
+    //                 billNo: String(i.billNo) || '',
+    //                 vendorName: i.vendorName || '',
+    //                 productName: i.productName || '',
+    //                 qty: i.qty || 0,
+    //                 typeOfBill: i.typeOfBill || '',
+    //                 billAmount: i.billAmount || 0,
+    //                 paymentType: i.paymentType || '',
+    //                 advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0, // ✅ ADD Number()
+    //                 photoOfBill: i.photoOfBill || '',
+    //                 transportationInclude: i.transportationInclude || '',
+    //                 transporterName: i.transporterName || '',
+    //                 amount: i.amount || 0,
+    //                 billStatus: i.billStatus || '',
+    //                 receivedQuantity: i.receivedQuantity || 0,
+    //                 photoOfProduct: i.photoOfProduct || '',
+    //                 unitOfMeasurement: i.unitOfMeasurement || '',
+    //                 damageOrder: i.damageOrder || '',
+    //                 quantityAsPerBill: i.quantityAsPerBill || 0,
+    //                 priceAsPerPo: i.priceAsPerPo || 0,
+    //                 remark: i.remark || '',
+    //                 // Map from existing StoreInSheet properties or set defaults
+    //                 poDate: '', // This doesn't exist in StoreInSheet
+    //                 poNumber: '', // This doesn't exist in StoreInSheet
+    //                 receiveStatus: i.status || '', // Map from 'status' field
+    //                 vendor: i.vendorName || '', // Map from vendorName
+    //                 product: i.productName || '', // Map from productName
+    //                 orderQuantity: i.qty || 0, // Map from qty
+    //                 receivedDate: i.timestamp || '', // Map from timestamp or set default
+    //                 warrantyStatus: '', // This doesn't exist in StoreInSheet
+    //                 warrantyEndDate: '', // This doesn't exist in StoreInSheet
+    //                 billNumber: i.billNumber || '', // This exists in StoreInSheet
+    //                 anyTransport: i.transportationInclude || '', // Map from transportationInclude
+    //                 transportingAmount: i.amount || 0, // Map from amount or set default
 
-                    timestamp: i.timestamp || '',
-                    leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
-                    discountAmount: i.discountAmount || 0,
-                    billReceived: i.billStatus || '',
-                    billImage: i.photoOfBill || '',
-                }))
-        );
-    }, [storeInSheet]);
+    //                 timestamp: i.timestamp || '',
+    //                 leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
+    //                 discountAmount: i.discountAmount || 0,
+    //                 billReceived: i.billStatus || '',
+    //                 billImage: i.photoOfBill || '',
+    //             }))
+    //     );
+    // }, [storeInSheet]);
+
+    // Fetching table data
+useEffect(() => {
+    // Pehle firm name se filter karo (case-insensitive)
+    const filteredByFirm = storeInSheet.filter(item => 
+        user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
+    );
+    
+    setTableData(
+        filteredByFirm
+            .filter((i) => i.planned6 !== '' && i.actual6 === '')
+            .map((i) => ({
+                liftNumber: i.liftNumber || '',
+                indentNo: i.indentNo || '',
+                billNo: String(i.billNo) || '',
+                vendorName: i.vendorName || '',
+                productName: i.productName || '',
+                qty: i.qty || 0,
+                typeOfBill: i.typeOfBill || '',
+                billAmount: i.billAmount || 0,
+                paymentType: i.paymentType || '',
+                advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0,
+                photoOfBill: i.photoOfBill || '',
+                transportationInclude: i.transportationInclude || '',
+                transporterName: i.transporterName || '',
+                amount: i.amount || 0,
+                poDate: i.poDate || '',
+                poNumber: i.poNumber || '',
+                vendor: i.vendor || '',
+                indentNumber: i.indentNumber || '',
+                product: i.product || '',
+                uom: i.uom || '',
+                poCopy: i.poCopy || '',
+                billStatus: i.billStatus || '',
+                leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
+                discountAmount: i.discountAmount || 0,
+                firmNameMatch: i.firmNameMatch || '',
+            }))
+    );
+}, [storeInSheet, user.firmNameMatch]);
+
+useEffect(() => {
+    // Pehle firm name se filter karo (case-insensitive)
+    const filteredByFirm = storeInSheet.filter(item => 
+        user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
+    );
+    
+    setHistoryData(
+        filteredByFirm
+            .filter((i) => i.actual6 !== '')
+            .map((i) => ({
+                liftNumber: i.liftNumber || '',
+                indentNo: i.indentNo || '',
+                billNo: String(i.billNo) || '',
+                vendorName: i.vendorName || '',
+                productName: i.productName || '',
+                qty: i.qty || 0,
+                typeOfBill: i.typeOfBill || '',
+                billAmount: i.billAmount || 0,
+                paymentType: i.paymentType || '',
+                advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0,
+                photoOfBill: i.photoOfBill || '',
+                transportationInclude: i.transportationInclude || '',
+                transporterName: i.transporterName || '',
+                amount: i.amount || 0,
+                billStatus: i.billStatus || '',
+                receivedQuantity: i.receivedQuantity || 0,
+                photoOfProduct: i.photoOfProduct || '',
+                unitOfMeasurement: i.unitOfMeasurement || '',
+                damageOrder: i.damageOrder || '',
+                quantityAsPerBill: i.quantityAsPerBill || 0,
+                priceAsPerPo: i.priceAsPerPo || 0,
+                remark: i.remark || '',
+                poDate: '',
+                poNumber: '',
+                receiveStatus: i.status || '',
+                vendor: i.vendorName || '',
+                product: i.productName || '',
+                orderQuantity: i.qty || 0,
+                receivedDate: i.timestamp || '',
+                warrantyStatus: '',
+                warrantyEndDate: '',
+                billNumber: i.billNumber || '',
+                anyTransport: i.transportationInclude || '',
+                transportingAmount: i.amount || 0,
+                timestamp: i.timestamp || '',
+                leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
+                discountAmount: i.discountAmount || 0,
+                billReceived: i.billStatus || '',
+                billImage: i.photoOfBill || '',
+                firmNameMatch: i.firmNameMatch || '',
+            }))
+    );
+}, [storeInSheet, user.firmNameMatch]);
 
 
     const columns: ColumnDef<RecieveItemsData>[] = [
@@ -243,6 +339,7 @@ export default () => {
         { accessorKey: 'poNumber', header: 'PO Number' },
         { accessorKey: 'vendorName', header: 'Vendor Name' },
         { accessorKey: 'productName', header: 'Product Name' },
+        { accessorKey: 'firmNameMatch', header: 'Firm Name' },
         { accessorKey: 'billStatus', header: 'Bill Status' },
         { accessorKey: 'billNo', header: 'Bill No.' },
         { accessorKey: 'qty', header: 'Qty' },
@@ -275,6 +372,7 @@ export default () => {
         { accessorKey: 'liftNumber', header: 'Lift Number' },
         { accessorKey: 'indentNo', header: 'Indent No.' },
         { accessorKey: 'poNumber', header: 'PO Number' },
+        { accessorKey: 'firmNameMatch', header: 'Firm Name' },
         { accessorKey: 'vendorName', header: 'Vendor Name' },
         { accessorKey: 'productName', header: 'Product Name' },
         { accessorKey: 'billStatus', header: 'Bill Status' },

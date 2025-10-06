@@ -60,6 +60,7 @@ interface StoreInPendingData {
     leadTimeToLiftMaterial: number;
     discountAmount: number;
     rowIndex?: number; // Added to fix the error
+    firmNameMatch: string;
 }
 
 
@@ -79,42 +80,85 @@ export default () => {
     const [indentLoading, setIndentLoading] = useState(false);
     const [receivedLoading, setReceivedLoading] = useState(false);
 
-    useEffect(() => {
-        setTableData(
-            storeInSheet
-                .filter((i) => i.planned11 !== '' && i.actual11 === '')
-                .map((i) => ({
-                    liftNumber: i.liftNumber || '',
-                    indentNo: i.indentNo || '',
-                    billNo: String(i.billNo) || '',
-                    vendorName: i.vendorName || '',
-                    productName: i.productName || '',
-                    qty: i.qty || 0,
-                    typeOfBill: i.typeOfBill || '',
-                    billAmount: i.billAmount || 0,
-                    paymentType: i.paymentType || '',
-                    advanceAmountIfAny: i.advanceAmountIfAny || '',
-                    photoOfBill: i.photoOfBill || '',
-                    transportationInclude: i.transportationInclude || '',
-                    transporterName: i.transporterName || '',
-                    amount: i.amount || 0,
-                    // Add missing mapped properties
-                    poDate: i.poDate || '',
-                    poNumber: i.poNumber || '',
-                    vendor: i.vendor || '',
-                    indentNumber: i.indentNumber || '',
-                    product: i.product || '',
-                    uom: i.uom || '',
-                    quantity: i.quantity || 0,
-                    poCopy: i.poCopy || '',
+    // useEffect(() => {
+    //     setTableData(
+    //         storeInSheet
+    //             .filter((i) => i.planned11 !== '' && i.actual11 === '')
+    //             .map((i) => ({
+    //                 liftNumber: i.liftNumber || '',
+    //                 indentNo: i.indentNo || '',
+    //                 billNo: String(i.billNo) || '',
+    //                 vendorName: i.vendorName || '',
+    //                 productName: i.productName || '',
+    //                 qty: i.qty || 0,
+    //                 typeOfBill: i.typeOfBill || '',
+    //                 billAmount: i.billAmount || 0,
+    //                 paymentType: i.paymentType || '',
+    //                 advanceAmountIfAny: i.advanceAmountIfAny || '',
+    //                 photoOfBill: i.photoOfBill || '',
+    //                 transportationInclude: i.transportationInclude || '',
+    //                 transporterName: i.transporterName || '',
+    //                 amount: i.amount || 0,
+    //                 // Add missing mapped properties
+    //                 poDate: i.poDate || '',
+    //                 poNumber: i.poNumber || '',
+    //                 vendor: i.vendor || '',
+    //                 indentNumber: i.indentNumber || '',
+    //                 product: i.product || '',
+    //                 uom: i.uom || '',
+    //                 quantity: i.quantity || 0,
+    //                 poCopy: i.poCopy || '',
 
-                    billStatus: i.billStatus || '',
-                    leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
-                    discountAmount: i.discountAmount || 0,
-                    rowIndex: i.rowIndex,
-                }))
-        );
-    }, [storeInSheet]);
+    //                 billStatus: i.billStatus || '',
+    //                 leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
+    //                 discountAmount: i.discountAmount || 0,
+    //                 rowIndex: i.rowIndex,
+    //             }))
+    //     );
+    // }, [storeInSheet]);
+
+    useEffect(() => {
+    // Pehle firm name se filter karo (case-insensitive)
+    const filteredByFirm = storeInSheet.filter(item => 
+        user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
+    );
+    
+    setTableData(
+        filteredByFirm
+            .filter((i) => i.planned11 !== '' && i.actual11 === '')
+            .map((i) => ({
+                liftNumber: i.liftNumber || '',
+                indentNo: i.indentNo || '',
+                billNo: String(i.billNo) || '',
+                vendorName: i.vendorName || '',
+                productName: i.productName || '',
+                qty: i.qty || 0,
+                typeOfBill: i.typeOfBill || '',
+                billAmount: i.billAmount || 0,
+                paymentType: i.paymentType || '',
+                advanceAmountIfAny: i.advanceAmountIfAny || '',
+                photoOfBill: i.photoOfBill || '',
+                transportationInclude: i.transportationInclude || '',
+                transporterName: i.transporterName || '',
+                amount: i.amount || 0,
+                // Add missing mapped properties
+                poDate: i.poDate || '',
+                poNumber: i.poNumber || '',
+                vendor: i.vendor || '',
+                indentNumber: i.indentNumber || '',
+                product: i.product || '',
+                uom: i.uom || '',
+                quantity: i.quantity || 0,
+                poCopy: i.poCopy || '',
+
+                billStatus: i.billStatus || '',
+                leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
+                discountAmount: i.discountAmount || 0,
+                rowIndex: i.rowIndex,
+                 firmNameMatch: i.firmNameMatch || '',
+            }))
+    );
+}, [storeInSheet, user.firmNameMatch]);
 
 
     useEffect(() => {
@@ -133,15 +177,20 @@ export default () => {
     };
 
     const schema = z.object({
-        status: z.enum(['ok', 'Not ok']),
-    });
+    status: z.enum(['ok']),
+    billImageStatus: z.instanceof(File).optional().refine((file) => {
+        if (!file) return true;
+        return file.size <= 5 * 1024 * 1024; // 5MB max
+    }, 'File size should be less than 5MB'),
+});
 
     const form = useForm({
-        resolver: zodResolver(schema),
-        defaultValues: {
-            status: undefined,
-        },
-    });
+    resolver: zodResolver(schema),
+    defaultValues: {
+        status: undefined,
+        billImageStatus: undefined,
+    },
+});
 
 
     const columns: ColumnDef<RecieveItemsData>[] = [
@@ -171,6 +220,7 @@ export default () => {
         { accessorKey: 'indentNo', header: 'Indent No.' },
         { accessorKey: 'poNumber', header: 'PO Number' },
         { accessorKey: 'vendorName', header: 'Vendor Name' },
+         { accessorKey: 'firmNameMatch', header: 'Firm Name' }, 
         { accessorKey: 'productName', header: 'Product Name' },
         { accessorKey: 'billStatus', header: 'Bill Status' },
         { accessorKey: 'billNo', header: 'Bill No.' },
@@ -207,29 +257,66 @@ export default () => {
 
 
 
+    // async function onSubmit(values: z.infer<typeof schema>) {
+    //     try {
+    //         const mappedData = [
+    //             {
+    //                 indentNo: selectedIndent!.indentNo,
+    //                 actual11: new Date().toISOString(),
+    //                 billStatusNew: values.status,
+    //                 rowIndex: selectedIndent!.rowIndex, // ✅ Add this line
+    //             }
+    //         ];
+
+    //         console.log('Mapped data to post:', mappedData);
+
+    //         await postToSheet(mappedData, 'update', 'STORE IN');
+
+    //         toast.success(`Bill status updated for ${selectedIndent?.indentNo}`);
+    //         setOpenDialog(false);
+    //         setTimeout(() => updateAll(), 1000);
+    //     } catch (err) {
+    //         console.error("Error:", err);
+    //         toast.error('Failed to update');
+    //     }
+    // }
+
+
     async function onSubmit(values: z.infer<typeof schema>) {
-        try {
-            const mappedData = [
-                {
-                    indentNo: selectedIndent!.indentNo,
-                    actual11: new Date().toISOString(),
-                    billStatusNew: values.status,
-                    rowIndex: selectedIndent!.rowIndex, // ✅ Add this line
-                }
-            ];
-
-            console.log('Mapped data to post:', mappedData);
-
-            await postToSheet(mappedData, 'update', 'STORE IN');
-
-            toast.success(`Bill status updated for ${selectedIndent?.indentNo}`);
-            setOpenDialog(false);
-            setTimeout(() => updateAll(), 1000);
-        } catch (err) {
-            console.error("Error:", err);
-            toast.error('Failed to update');
+    try {
+        let billImageUrl = '';
+        
+        // Upload image if provided
+        if (values.billImageStatus) {
+            const uploadedUrl = await uploadFile(
+                values.billImageStatus,
+                import.meta.env.VITE_BILL_PHOTO_FOLDER
+            );
+            billImageUrl = uploadedUrl;
         }
+
+        const mappedData = [
+            {
+                indentNo: selectedIndent!.indentNo,
+                actual11: new Date().toISOString(),
+                billStatusNew: values.status,
+                billImageStatus: billImageUrl,
+                rowIndex: selectedIndent!.rowIndex,
+            }
+        ];
+
+        console.log('Mapped data to post:', mappedData);
+
+        await postToSheet(mappedData, 'update', 'STORE IN');
+
+        toast.success(`Bill status updated for ${selectedIndent?.indentNo}`);
+        setOpenDialog(false);
+        setTimeout(() => updateAll(), 1000);
+    } catch (err) {
+        console.error("Error:", err);
+        toast.error('Failed to update');
     }
+}
 
 
 
@@ -329,35 +416,55 @@ export default () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="grid md:grid-cols-2 gap-4">
-                                    <FormField
-                                        control={form.control}
-                                        name="status"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormControl>
-                                                    <Select
-                                                        onValueChange={field.onChange}
-                                                        value={field.value}
-                                                    >
-                                                        <FormLabel>Status</FormLabel>
-                                                        <FormControl>
-                                                            <SelectTrigger className="w-full">
-                                                                <SelectValue placeholder="Set status" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            <SelectItem value="ok">ok</SelectItem>           {/* ✅ Change value */}
-                                                            <SelectItem value="Not ok">Not ok</SelectItem>   {/* ✅ Change value */}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FormControl>
-                                            </FormItem>
-                                        )}
-                                    />
+                               <div className="grid md:grid-cols-2 gap-4">
+    <FormField
+        control={form.control}
+        name="status"
+        render={({ field }) => (
+            <FormItem>
+                <FormControl>
+                    <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                    >
+                        <FormLabel>Status</FormLabel>
+                        <FormControl>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Set status" />
+                            </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            <SelectItem value="ok">ok</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </FormControl>
+            </FormItem>
+        )}
+    />
 
-
-                                </div>
+    {form.watch('status') === 'ok' && (
+        <FormField
+            control={form.control}
+            name="billImageStatus"
+            render={({ field: { onChange, value, ...field } }) => (
+                <FormItem>
+                    <FormLabel>Bill Image</FormLabel>
+                    <FormControl>
+                        <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) onChange(file);
+                            }}
+                            {...field}
+                        />
+                    </FormControl>
+                </FormItem>
+            )}
+        />
+    )}
+</div>
 
 
                                 <DialogFooter>

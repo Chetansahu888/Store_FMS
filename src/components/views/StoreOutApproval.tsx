@@ -65,51 +65,105 @@ export default () => {
     const [rejecting, setRejecting] = useState(false);
 
     // Fetching table data
-    useEffect(() => {
-        setTableData(
-            indentSheet
-                .filter(
-                    (sheet) =>
-                        sheet.planned6 !== '' &&
-                        sheet.actual6 === '' &&
-                        sheet.indentType === 'Store Out'
-                )
-                .map((sheet) => ({
-                    indentNo: sheet.indentNumber,
-                    indenter: sheet.indenterName,
-                    department: sheet.department,
-                    product: sheet.productName,
-                    date: formatDate(new Date(sheet.timestamp)),
-                    areaOfUse: sheet.areaOfUse,
-                    quantity: sheet.quantity,
-                    uom: sheet.uom,
-                    specifications: sheet.specifications || 'Not specified',
-                    attachment: sheet.attachment || '',
-                }))
-        );
-        setHistoryData(
-            indentSheet
-                .filter(
-                    (sheet) =>
-                        sheet.planned6 !== '' &&
-                        sheet.actual6 !== '' &&
-                        sheet.indentType === 'Store Out'
-                )
-                .map((sheet) => ({
-                    approvalDate: formatDate(new Date(sheet.actual6)),
-                    indentNo: sheet.indentNumber,
-                    indenter: sheet.indenterName,
-                    department: sheet.department,
-                    product: sheet.productName,
-                    date: formatDate(new Date(sheet.timestamp)),
-                    areaOfUse: sheet.areaOfUse,
-                    quantity: sheet.issuedQuantity,
-                    requestedQuantity: sheet.quantity,
-                    uom: sheet.uom,
-                    issuedStatus: sheet.issuedStatus,
-                }))
-        );
-    }, [indentSheet]);
+    // useEffect(() => {
+        
+    //     setTableData(
+    //         indentSheet
+    //             .filter(
+    //                 (sheet) =>
+    //                     sheet.planned6 !== '' &&
+    //                     sheet.actual6 === '' &&
+    //                     sheet.indentType === 'Store Out'
+    //             )
+    //             .map((sheet) => ({
+    //                 indentNo: sheet.indentNumber,
+    //                 indenter: sheet.indenterName,
+    //                 department: sheet.department,
+    //                 product: sheet.productName,
+    //                 date: formatDate(new Date(sheet.timestamp)),
+    //                 areaOfUse: sheet.areaOfUse,
+    //                 quantity: sheet.quantity,
+    //                 uom: sheet.uom,
+    //                 specifications: sheet.specifications || 'Not specified',
+    //                 attachment: sheet.attachment || '',
+    //             }))
+    //     );
+    //     setHistoryData(
+    //         indentSheet
+    //             .filter(
+    //                 (sheet) =>
+    //                     sheet.planned6 !== '' &&
+    //                     sheet.actual6 !== '' &&
+    //                     sheet.indentType === 'Store Out'
+    //             )
+    //             .map((sheet) => ({
+    //                 approvalDate: formatDate(new Date(sheet.actual6)),
+    //                 indentNo: sheet.indentNumber,
+    //                 indenter: sheet.indenterName,
+    //                 department: sheet.department,
+    //                 product: sheet.productName,
+    //                 date: formatDate(new Date(sheet.timestamp)),
+    //                 areaOfUse: sheet.areaOfUse,
+    //                 quantity: sheet.issuedQuantity,
+    //                 requestedQuantity: sheet.quantity,
+    //                 uom: sheet.uom,
+    //                 issuedStatus: sheet.issuedStatus,
+    //             }))
+    //     );
+    // }, [indentSheet]);
+
+
+    // Fetching table data
+useEffect(() => {
+    // Pehle firm name se filter karo (case-insensitive)
+    const filteredByFirm = indentSheet.filter(item => 
+        user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
+    );
+    
+    setTableData(
+        filteredByFirm
+            .filter(
+                (sheet) =>
+                    sheet.planned6 !== '' &&
+                    sheet.actual6 === '' &&
+                    sheet.indentType === 'Store Out'
+            )
+            .map((sheet) => ({
+                indentNo: sheet.indentNumber,
+                indenter: sheet.indenterName,
+                department: sheet.department,
+                product: sheet.productName,
+                date: formatDate(new Date(sheet.timestamp)),
+                areaOfUse: sheet.areaOfUse,
+                quantity: sheet.quantity,
+                uom: sheet.uom,
+                specifications: sheet.specifications || 'Not specified',
+                attachment: sheet.attachment || '',
+            }))
+    );
+    setHistoryData(
+        filteredByFirm
+            .filter(
+                (sheet) =>
+                    sheet.planned6 !== '' &&
+                    sheet.actual6 !== '' &&
+                    sheet.indentType === 'Store Out'
+            )
+            .map((sheet) => ({
+                approvalDate: formatDate(new Date(sheet.actual6)),
+                indentNo: sheet.indentNumber,
+                indenter: sheet.indenterName,
+                department: sheet.department,
+                product: sheet.productName,
+                date: formatDate(new Date(sheet.timestamp)),
+                areaOfUse: sheet.areaOfUse,
+                quantity: sheet.issuedQuantity,
+                requestedQuantity: sheet.quantity,
+                uom: sheet.uom,
+                issuedStatus: sheet.issuedStatus,
+            }))
+    );
+}, [indentSheet, user.firmNameMatch]);
 
     // Creating table columns
     const columns: ColumnDef<StoreOutTableData>[] = [
