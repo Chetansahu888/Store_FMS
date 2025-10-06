@@ -217,98 +217,98 @@ export default () => {
     // }, [storeInSheet]);
 
     // Fetching table data
-useEffect(() => {
-    // Pehle firm name se filter karo (case-insensitive)
-    const filteredByFirm = storeInSheet.filter(item => 
-        user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
-    );
-    
-    setTableData(
-        filteredByFirm
-            .filter((i) => i.planned6 !== '' && i.actual6 === '')
-            .map((i) => ({
-                liftNumber: i.liftNumber || '',
-                indentNo: i.indentNo || '',
-                billNo: String(i.billNo) || '',
-                vendorName: i.vendorName || '',
-                productName: i.productName || '',
-                qty: i.qty || 0,
-                typeOfBill: i.typeOfBill || '',
-                billAmount: i.billAmount || 0,
-                paymentType: i.paymentType || '',
-                advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0,
-                photoOfBill: i.photoOfBill || '',
-                transportationInclude: i.transportationInclude || '',
-                transporterName: i.transporterName || '',
-                amount: i.amount || 0,
-                poDate: i.poDate || '',
-                poNumber: i.poNumber || '',
-                vendor: i.vendor || '',
-                indentNumber: i.indentNumber || '',
-                product: i.product || '',
-                uom: i.uom || '',
-                poCopy: i.poCopy || '',
-                billStatus: i.billStatus || '',
-                leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
-                discountAmount: i.discountAmount || 0,
-                firmNameMatch: i.firmNameMatch || '',
-            }))
-    );
-}, [storeInSheet, user.firmNameMatch]);
+    useEffect(() => {
+        // Pehle firm name se filter karo (case-insensitive)
+        const filteredByFirm = storeInSheet.filter(item =>
+            user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
+        );
 
-useEffect(() => {
-    // Pehle firm name se filter karo (case-insensitive)
-    const filteredByFirm = storeInSheet.filter(item => 
-        user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
-    );
-    
-    setHistoryData(
-        filteredByFirm
-            .filter((i) => i.actual6 !== '')
-            .map((i) => ({
-                liftNumber: i.liftNumber || '',
-                indentNo: i.indentNo || '',
-                billNo: String(i.billNo) || '',
-                vendorName: i.vendorName || '',
-                productName: i.productName || '',
-                qty: i.qty || 0,
-                typeOfBill: i.typeOfBill || '',
-                billAmount: i.billAmount || 0,
-                paymentType: i.paymentType || '',
-                advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0,
-                photoOfBill: i.photoOfBill || '',
-                transportationInclude: i.transportationInclude || '',
-                transporterName: i.transporterName || '',
-                amount: i.amount || 0,
-                billStatus: i.billStatus || '',
-                receivedQuantity: i.receivedQuantity || 0,
-                photoOfProduct: i.photoOfProduct || '',
-                unitOfMeasurement: i.unitOfMeasurement || '',
-                damageOrder: i.damageOrder || '',
-                quantityAsPerBill: i.quantityAsPerBill || 0,
-                priceAsPerPo: i.priceAsPerPo || 0,
-                remark: i.remark || '',
-                poDate: '',
-                poNumber: '',
-                receiveStatus: i.status || '',
-                vendor: i.vendorName || '',
-                product: i.productName || '',
-                orderQuantity: i.qty || 0,
-                receivedDate: i.timestamp || '',
-                warrantyStatus: '',
-                warrantyEndDate: '',
-                billNumber: i.billNumber || '',
-                anyTransport: i.transportationInclude || '',
-                transportingAmount: i.amount || 0,
-                timestamp: i.timestamp || '',
-                leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
-                discountAmount: i.discountAmount || 0,
-                billReceived: i.billStatus || '',
-                billImage: i.photoOfBill || '',
-                firmNameMatch: i.firmNameMatch || '',
-            }))
-    );
-}, [storeInSheet, user.firmNameMatch]);
+        setTableData(
+            filteredByFirm
+                .filter((i) => i.planned6 !== '' && i.actual6 === '')
+                .map((i) => ({
+                    liftNumber: i.liftNumber || '',
+                    indentNo: i.indentNo || '',
+                    billNo: String(i.billNo) || '',
+                    vendorName: i.vendorName || '',
+                    productName: i.productName || '',
+                    qty: i.qty || 0,
+                    typeOfBill: i.typeOfBill || '',
+                    billAmount: i.billAmount || 0,
+                    paymentType: i.paymentType || '',
+                    advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0,
+                    photoOfBill: i.photoOfBill || '',
+                    transportationInclude: i.transportationInclude || '',
+                    transporterName: i.transporterName || '',
+                    amount: i.amount || 0,
+                    poDate: i.poDate || '',
+                    poNumber: i.poNumber || '',
+                    vendor: i.vendor || '',
+                    indentNumber: i.indentNumber || '',
+                    product: i.product || '',
+                    uom: i.uom || '',
+                    poCopy: i.poCopy || '',
+                    billStatus: i.billStatus || '',
+                    leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
+                    discountAmount: i.discountAmount || 0,
+                    firmNameMatch: i.firmNameMatch || '',
+                }))
+        );
+    }, [storeInSheet, user.firmNameMatch]);
+
+    useEffect(() => {
+        // Pehle firm name se filter karo (case-insensitive)
+        const filteredByFirm = storeInSheet.filter(item =>
+            user.firmNameMatch.toLowerCase() === "all" || item.firmNameMatch === user.firmNameMatch
+        );
+
+        setHistoryData(
+            filteredByFirm
+                .filter((i) => i.actual6 !== '')
+                .map((i) => ({
+                    liftNumber: i.liftNumber || '',
+                    indentNo: i.indentNo || '',
+                    billNo: String(i.billNo) || '',
+                    vendorName: i.vendorName || '',
+                    productName: i.productName || '',
+                    qty: i.qty || 0,
+                    typeOfBill: i.typeOfBill || '',
+                    billAmount: i.billAmount || 0,
+                    paymentType: i.paymentType || '',
+                    advanceAmountIfAny: Number(i.advanceAmountIfAny) || 0,
+                    photoOfBill: i.photoOfBill || '',
+                    transportationInclude: i.transportationInclude || '',
+                    transporterName: i.transporterName || '',
+                    amount: i.amount || 0,
+                    billStatus: i.billStatus || '',
+                    receivedQuantity: i.receivedQuantity || 0,
+                    photoOfProduct: i.photoOfProduct || '',
+                    unitOfMeasurement: i.unitOfMeasurement || '',
+                    damageOrder: i.damageOrder || '',
+                    quantityAsPerBill: i.quantityAsPerBill || 0,
+                    priceAsPerPo: i.priceAsPerPo || 0,
+                    remark: i.remark || '',
+                    poDate: '',
+                    poNumber: '',
+                    receiveStatus: i.status || '',
+                    vendor: i.vendorName || '',
+                    product: i.productName || '',
+                    orderQuantity: i.qty || 0,
+                    receivedDate: i.timestamp || '',
+                    warrantyStatus: '',
+                    warrantyEndDate: '',
+                    billNumber: i.billNumber || '',
+                    anyTransport: i.transportationInclude || '',
+                    transportingAmount: i.amount || 0,
+                    timestamp: i.timestamp || '',
+                    leadTimeToLiftMaterial: i.leadTimeToLiftMaterial || 0,
+                    discountAmount: i.discountAmount || 0,
+                    billReceived: i.billStatus || '',
+                    billImage: i.photoOfBill || '',
+                    firmNameMatch: i.firmNameMatch || '',
+                }))
+        );
+    }, [storeInSheet, user.firmNameMatch]);
 
 
     const columns: ColumnDef<RecieveItemsData>[] = [
@@ -545,8 +545,8 @@ useEffect(() => {
                         billAmount: values.billAmount || 0,
                         billImage: photoOfBillUrl,
                         damageOrder: values.damageOrder,
-                        quantityAsPerBill: values.quantityAsPerBill === 'Yes' ? 1 : 0,
-                        priceAsPerPo: values.priceAsPerPo === 'Yes' ? 1 : 0,
+                        quantityAsPerBill: values.quantityAsPerBill || '',  // ✅ Changed from ternary to direct assignment
+                        priceAsPerPo: values.priceAsPerPo || '',  // ✅ Changed from ternary to direct assignment
                         remark: values.remark || '',
                         materialStatus: values.materialStatus || '',
                     })),

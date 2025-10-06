@@ -725,6 +725,7 @@ export default () => {
                                                                 type="number"
                                                                 placeholder="Enter amount"
                                                                 {...field}
+                                                                disabled={form.watch("transportationInclude") !== "Yes"}
                                                             />
                                                         </FormControl>
                                                     </FormItem>
