@@ -37,7 +37,9 @@ interface GetPurchaseData {
     quantity: number;
     uom: string;
     poNumber: string;
-     firmNameMatch: string;
+    firmNameMatch: string;
+    receivedQty: number;
+    pendingPoQty: number;
 }
 
 interface HistoryData {
@@ -96,26 +98,28 @@ export default () => {
     // }, [indentSheet]);
 
     useEffect(() => {
-    // Pehle firm name se filter karo (case-insensitive)
-    const filteredByFirm = indentSheet.filter(sheet => 
-        user.firmNameMatch.toLowerCase() === "all" || sheet.firmNameMatch === user.firmNameMatch
-    );
-    
-    setTableData(
-        filteredByFirm
-            .filter((sheet) => sheet.liftingStatus === 'Pending')
-            .map((sheet) => ({
-                indentNo: sheet.indentNumber,
-                indenter: sheet.indenterName,
-                department: sheet.department,
-                product: sheet.productName,
-                quantity: sheet.pendingLiftQty,
-                uom: sheet.uom,
-                poNumber: sheet.poNumber,
-                firmNameMatch: sheet.firmNameMatch || '',
-            }))
-    );
-}, [indentSheet, user.firmNameMatch]);
+        // Pehle firm name se filter karo (case-insensitive)
+        const filteredByFirm = indentSheet.filter(sheet =>
+            user.firmNameMatch.toLowerCase() === "all" || sheet.firmNameMatch === user.firmNameMatch
+        );
+
+        setTableData(
+            filteredByFirm
+                .filter((sheet) => sheet.liftingStatus === 'Pending')
+                .map((sheet) => ({
+                    indentNo: sheet.indentNumber,
+                    indenter: sheet.indenterName,
+                    department: sheet.department,
+                    product: sheet.productName,
+                    quantity: sheet.pendingLiftQty,
+                    uom: sheet.uom,
+                    poNumber: sheet.poNumber,
+                    firmNameMatch: sheet.firmNameMatch || '',
+                    receivedQty: sheet.receivedQty || 0,
+                    pendingPoQty: sheet.pendingPoQty || 0,
+                }))
+        );
+    }, [indentSheet, user.firmNameMatch]);
 
 
     // useEffect(() => {
@@ -188,47 +192,47 @@ export default () => {
 
 
     useEffect(() => {
-    // Pehle firm name se filter karo (case-insensitive)
-    const filteredByFirm = indentSheet.filter(sheet => 
-        user.firmNameMatch.toLowerCase() === "all" || sheet.firmName === user.firmNameMatch
-    );
-    
-    // Pehle wo indent numbers nikaalo jinki lifting status complete hai
-    const completedIndentNumbers = filteredByFirm
-        .filter(sheet => sheet.liftingStatus === 'Complete')
-        .map(sheet => sheet.indentNumber);
+        // Pehle firm name se filter karo (case-insensitive)
+        const filteredByFirm = indentSheet.filter(sheet =>
+            user.firmNameMatch.toLowerCase() === "all" || sheet.firmName === user.firmNameMatch
+        );
 
-    // Ab storeInSheet se sirf wahi data dikhao jo completed indents se match kare
-    setHistoryData(
-        storeInSheet
-            .filter(sheet => completedIndentNumbers.includes(sheet.indentNo))
-            .map((sheet) => ({
-                liftNumber: sheet.liftNumber || '',
-                indentNo: sheet.indentNo || '',
-                poNumber: sheet.poNumber || '',
-                vendorName: sheet.vendorName || '',
-                productName: sheet.productName || '',
-                firmNameMatch: sheet.firmNameMatch || '',
-                billStatus: sheet.billStatus || '',
-                billNo: sheet.billNo || '',
-                qty: sheet.qty || 0,
-                leadTime: sheet.leadTimeToLiftMaterial || 0,
-                typeOfBill: sheet.typeOfBill || '',
-                billAmount: sheet.billAmount || 0,
-                discountAmount: sheet.discountAmount || 0,
-                paymentType: sheet.paymentType || '',
-                advanceAmount: Number(sheet.advanceAmountIfAny) || 0,
-                photoOfBill: sheet.photoOfBill || '',
-                transportationInclude: sheet.transportationInclude || '',
-                transporterName: sheet.transporterName || '',
-                vehicleNo: sheet.vehicleNo || '',
-                driverName: sheet.driverName || '',
-                driverMobileNo: sheet.driverMobileNo || '',
-                amount: sheet.amount || 0,
-            }))
-            .sort((a, b) => b.indentNo.localeCompare(a.indentNo))
-    );
-}, [storeInSheet, indentSheet, user.firmNameMatch]); // user.firmNameMatch bhi dependency mein add karo
+        // Pehle wo indent numbers nikaalo jinki lifting status complete hai
+        const completedIndentNumbers = filteredByFirm
+            .filter(sheet => sheet.liftingStatus === 'Complete')
+            .map(sheet => sheet.indentNumber);
+
+        // Ab storeInSheet se sirf wahi data dikhao jo completed indents se match kare
+        setHistoryData(
+            storeInSheet
+                .filter(sheet => completedIndentNumbers.includes(sheet.indentNo))
+                .map((sheet) => ({
+                    liftNumber: sheet.liftNumber || '',
+                    indentNo: sheet.indentNo || '',
+                    poNumber: sheet.poNumber || '',
+                    vendorName: sheet.vendorName || '',
+                    productName: sheet.productName || '',
+                    firmNameMatch: sheet.firmNameMatch || '',
+                    billStatus: sheet.billStatus || '',
+                    billNo: sheet.billNo || '',
+                    qty: sheet.qty || 0,
+                    leadTime: sheet.leadTimeToLiftMaterial || 0,
+                    typeOfBill: sheet.typeOfBill || '',
+                    billAmount: sheet.billAmount || 0,
+                    discountAmount: sheet.discountAmount || 0,
+                    paymentType: sheet.paymentType || '',
+                    advanceAmount: Number(sheet.advanceAmountIfAny) || 0,
+                    photoOfBill: sheet.photoOfBill || '',
+                    transportationInclude: sheet.transportationInclude || '',
+                    transporterName: sheet.transporterName || '',
+                    vehicleNo: sheet.vehicleNo || '',
+                    driverName: sheet.driverName || '',
+                    driverMobileNo: sheet.driverMobileNo || '',
+                    amount: sheet.amount || 0,
+                }))
+                .sort((a, b) => b.indentNo.localeCompare(a.indentNo))
+        );
+    }, [storeInSheet, indentSheet, user.firmNameMatch]); // user.firmNameMatch bhi dependency mein add karo
 
     // Creating table columns
     const columns: ColumnDef<GetPurchaseData>[] = [
@@ -261,7 +265,7 @@ export default () => {
             accessorKey: 'indentNo',
             header: 'Indent No.',
         },
-        { accessorKey: 'firmNameMatch', header: 'Firm Name' }, 
+        { accessorKey: 'firmNameMatch', header: 'Firm Name' },
 
         {
             accessorKey: 'indenter',
@@ -282,7 +286,15 @@ export default () => {
         },
         {
             accessorKey: 'quantity',
-            header: 'Quantity',
+            header: 'Pending Lift Qty',
+        },
+        {
+            accessorKey: 'receivedQty',
+            header: 'Received Qty',
+        },
+        {
+            accessorKey: 'pendingPoQty',
+            header: 'Pending PO Qty',
         },
         {
             accessorKey: 'uom',
@@ -300,7 +312,7 @@ export default () => {
         { accessorKey: 'poNumber', header: 'PO Number' },
         { accessorKey: 'vendorName', header: 'Vendor Name' },
         { accessorKey: 'productName', header: 'Product Name' },
-        { accessorKey: 'firmNameMatch', header: 'Firm Name' }, 
+        { accessorKey: 'firmNameMatch', header: 'Firm Name' },
         { accessorKey: 'billStatus', header: 'Bill Status' },
         { accessorKey: 'billNo', header: 'Bill No.' },
         { accessorKey: 'qty', header: 'Qty' },
