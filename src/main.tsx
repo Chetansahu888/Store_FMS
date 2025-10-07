@@ -87,7 +87,7 @@ const routes: RouteAttributes[] = [
     },
     {
         path: 'store-issue',
-        // gateKey: 'storeIssue',
+        gateKey: 'storeIssue',
         name: 'Store Issue',
         icon: <ClipboardList size={20} />,
         element: <StoreIssue />,
@@ -96,7 +96,7 @@ const routes: RouteAttributes[] = [
 
     {
         path: 'Issue-data',
-        // gateKey: 'indentApprovalView',
+        gateKey: 'issueData',
         name: 'Issue Data',
         icon: <ClipboardCheck size={20} />,
         element: <IssueData />,
@@ -208,7 +208,7 @@ const routes: RouteAttributes[] = [
     },
     {
         path: 'store-in',
-        gateKey: 'receiveItemView',
+        gateKey: 'storeIn',
         name: 'Store In',
         icon: <Truck size={20} />,
         element: <StoreIn />,
@@ -219,8 +219,8 @@ const routes: RouteAttributes[] = [
 
     {
         path: 'Quality-Check-In-Received-Item',
-        // gateKey: 'poMaster',
-        name: 'Instead of Quality Check In Received Item						',
+        gateKey: 'insteadOfQualityCheckInReceivedItem',
+        name: 'Instead of Quality Check In Received Item',
         icon: <Users size={20} />,
         element: <QuantityCheckInReceiveItem />,
         notifications: () => 0,
@@ -228,7 +228,7 @@ const routes: RouteAttributes[] = [
 
     {
         path: 'Exchange-Materials',
-        // gateKey: 'poMaster',
+        gateKey: 'exchangeMaterials',
         name: 'Exchange Materials',
         icon: <PackageCheck  size={20} />,
         element: <ExchangeMaterials />,
@@ -237,7 +237,7 @@ const routes: RouteAttributes[] = [
 
     {
         path: 'Return-Material-To-Party',
-        // gateKey: 'poMaster',
+        gateKey: 'returnMaterialToParty',
         name: 'Return Material To Party',
         icon: <Users size={20} />,
         element: <ReturnMaterialToParty />,
@@ -246,7 +246,7 @@ const routes: RouteAttributes[] = [
 
     {
         path: 'Send-Debit-Note',
-        // gateKey: 'poMaster',
+        gateKey: 'sendDebitNote',
         name: 'Send Debit Note',
         icon: <FilePlus2  size={20} />,
         element: <SendDebitNote />,
@@ -254,7 +254,7 @@ const routes: RouteAttributes[] = [
     },
     {
         path: 'audit-data',
-        // gateKey: 'poMaster',
+        gateKey: 'auditData',
         name: 'Audit Data',
         icon: <Users size={20} />,
         element: <AuditData />,
@@ -262,7 +262,7 @@ const routes: RouteAttributes[] = [
     },
     {
         path: 'rectify-the-mistake',
-        // gateKey: 'poMaster',
+        gateKey: 'rectifyTheMistake',
         name: 'Rectify the mistake',
         icon: <Users size={20} />,
         element: <RectifyTheMistake />,
@@ -270,7 +270,7 @@ const routes: RouteAttributes[] = [
     },
     {
         path: 'reaudit-data',
-        // gateKey: 'poMaster',
+        gateKey: 'reauditData',
         name: 'Reaudit Data',
         icon: <Users size={20} />,
         element: <ReauditData />,
@@ -278,7 +278,7 @@ const routes: RouteAttributes[] = [
     },
     {
         path: 'take-entry-by-tally',
-        // gateKey: 'poMaster',
+        gateKey: 'takeEntryByTelly',
         name: 'Take Entry By Tally',
         icon: <ClipboardList  size={20} />,
         element: <TakeEntryByTally />,
@@ -286,7 +286,7 @@ const routes: RouteAttributes[] = [
     },
     {
         path: 'AgainAuditing',
-        // gateKey: 'poMaster',
+        gateKey: 'againAuditing',
         name: 'Again Auditing',
         icon: <UserCheck  size={20} />,
         element: <AgainAuditing />,
@@ -309,7 +309,7 @@ const routes: RouteAttributes[] = [
     },
     {
         path: 'Bill-Not-Received',
-        gateKey: 'administrate',
+        gateKey: 'billNotReceived',
         name: 'BillNotReceived',
         icon: <ClipboardList  size={20} />,
         element: <BillNotReceived />,
@@ -317,7 +317,7 @@ const routes: RouteAttributes[] = [
     },
     {
         path: 'DBforPc',
-        gateKey: 'administrate',
+        gateKey: 'dbForPc',
         name: 'DB For PC',
         icon: <PackageCheck  size={20} />,
         element: <DBforPc />,

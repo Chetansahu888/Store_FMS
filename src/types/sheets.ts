@@ -222,6 +222,19 @@ export type UserPermissions = {
     getPurchase: boolean;
     storeIssue: boolean;
     firmNameMatch: string;
+    againAuditing: boolean;
+    takeEntryByTelly: boolean;
+    reauditData: boolean;
+    rectifyTheMistake: boolean;
+    auditData: boolean;
+    sendDebitNote: boolean;
+    returnMaterialToParty: boolean;
+    exchangeMaterials: boolean;
+    insteadOfQualityCheckInReceivedItem: boolean;
+    dbForPc : boolean;
+    billNotReceived:boolean;
+    storeIn: boolean;
+    issueData: boolean;
 };
 
 export const allPermissionKeys = [
@@ -242,6 +255,19 @@ export const allPermissionKeys = [
     "ordersView",
     "poMaster",
     "storeIssue",
+    "againAuditing",
+    "takeEntryByTelly",
+    "reauditData",
+    "rectifyTheMistake",
+    "auditData",
+    "sendDebitNote",
+    "returnMaterialToParty",
+    "exchangeMaterials",
+    "insteadOfQualityCheckInReceivedItem",
+    "dbForPc",
+    "billNotReceived",
+    "storeIn",
+    "issueData",
 ] as const;
 
 
@@ -360,7 +386,7 @@ export type StoreInSheet = {
     billRemark: string;
 
     firmNameMatch: string;
-    
+
 }
 
 
