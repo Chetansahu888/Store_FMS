@@ -175,8 +175,9 @@ export async function fetchSheet(
 
     console.log("📦 FINAL - Total vendors parsed:", vendors.length);
 
-    return {
+   return {
         vendors,
+        vendorNames: vendors.map(v => v.vendorName),
         departments: [...departments],
         paymentTerms: [...paymentTerms],
         groupHeads: Object.fromEntries(Object.entries(groupHeads).map(([k, v]) => [k, [...v]])),
