@@ -54,6 +54,18 @@ interface HistoryData {
 export default () => {
     const { indentSheet, indentLoading, updateIndentSheet, masterSheet: options } = useSheets();
     const { user } = useAuth();
+    useEffect(() => {
+        console.log("Master Sheet Options:", options);
+        console.log("Vendors:", options?.vendors);
+        console.log("Payment Terms:", options?.paymentTerms);
+
+        // ✅ Yeh bhi check karo
+        if (!options) {
+            console.log("⚠️ Master Sheet is still loading...");
+        } else {
+            console.log("✅ Master Sheet loaded successfully!");
+        }
+    }, [options]);
 
     const [selectedIndent, setSelectedIndent] = useState<VendorUpdateData | null>(null);
     const [selectedHistory, setSelectedHistory] = useState<HistoryData | null>(null);
@@ -63,93 +75,58 @@ export default () => {
     const [editingRow, setEditingRow] = useState<string | null>(null);
     const [editValues, setEditValues] = useState<Partial<HistoryData>>({});
 
-    // Fetching table data
-    // useEffect(() => {
-    //     setTableData(
-    //         indentSheet
-    //             .filter((sheet) => sheet.planned2 !== '' && sheet.actual2 === '')
-    //             .map((sheet) => ({
-    //                 indentNo: sheet.indentNumber,
-    //                 indenter: sheet.indenterName,
-    //                 department: sheet.department,
-    //                 product: sheet.productName,
-    //                 quantity: sheet.approvedQuantity,
-    //                 uom: sheet.uom,
-    //                 vendorType: sheet.vendorType as VendorUpdateData['vendorType'],
-    //             }))
-    //     );
-    //     setHistoryData(
-    //         indentSheet
-    //             .filter((sheet) => sheet.planned2 !== '' && sheet.actual2 !== '')
-    //             .map((sheet) => ({
-    //                 date: formatDate(new Date(sheet.actual2)),
-    //                 indentNo: sheet.indentNumber,
-    //                 indenter: sheet.indenterName,
-    //                 department: sheet.department,
-    //                 product: sheet.productName,
-    //                 quantity: sheet.quantity,
-    //                 uom: sheet.uom,
-    //                 rate: sheet.approvedRate || 0,
-    //                 vendorType: sheet.vendorType as HistoryData['vendorType'],
-    //                 // lastUpdated: sheet.lastUpdated,
-    //             }))
-    //             // Sort by indentNo in descending order (newest first)
-    //             .sort((a, b) => {
-    //                 return b.indentNo.localeCompare(a.indentNo);
-    //             })
-    //     );
-    // }, [indentSheet]);
+
 
     // Fetching table data
-useEffect(() => {
-    // Pehle firm name se filter karo
-    const filteredByFirm = indentSheet.filter(sheet => 
-        user.firmNameMatch.toLowerCase() === "all" || sheet.firmName === user.firmNameMatch
-    );
-    
-    setTableData(
-        filteredByFirm
-            .filter((sheet) => sheet.planned2 !== '' && sheet.actual2 === '')
-            .map((sheet) => ({
-                indentNo: sheet.indentNumber,
-                firmNameMatch: sheet.firmNameMatch || '',
-                indenter: sheet.indenterName,
-                department: sheet.department,
-                product: sheet.productName,
-                quantity: sheet.approvedQuantity,
-                uom: sheet.uom,
-                vendorType: sheet.vendorType as VendorUpdateData['vendorType'],
-            }))
-    );
-}, [indentSheet, user.firmNameMatch]);
+    useEffect(() => {
+        // Pehle firm name se filter karo
+        const filteredByFirm = indentSheet.filter(sheet =>
+            user.firmNameMatch.toLowerCase() === "all" || sheet.firmName === user.firmNameMatch
+        );
 
-useEffect(() => {
-    // Pehle firm name se filter karo
-    const filteredByFirm = indentSheet.filter(sheet => 
-        user.firmNameMatch.toLowerCase() === "all" || sheet.firmName === user.firmNameMatch
-    );
-    
-    setHistoryData(
-        filteredByFirm
-            .filter((sheet) => sheet.planned2 !== '' && sheet.actual2 !== '')
-            .map((sheet) => ({
-                date: formatDate(new Date(sheet.actual2)),
-                indentNo: sheet.indentNumber,
-                firmNameMatch: sheet.firmNameMatch || '',
-                indenter: sheet.indenterName,
-                department: sheet.department,
-                product: sheet.productName,
-                quantity: sheet.quantity,
-                uom: sheet.uom,
-                rate: sheet.approvedRate || 0,
-                vendorType: sheet.vendorType as HistoryData['vendorType'],
-            }))
-            // Sort by indentNo in descending order (newest first)
-            .sort((a, b) => {
-                return b.indentNo.localeCompare(a.indentNo);
-            })
-    );
-}, [indentSheet, user.firmNameMatch]);
+        setTableData(
+            filteredByFirm
+                .filter((sheet) => sheet.planned2 !== '' && sheet.actual2 === '')
+                .map((sheet) => ({
+                    indentNo: sheet.indentNumber,
+                    firmNameMatch: sheet.firmNameMatch || '',
+                    indenter: sheet.indenterName,
+                    department: sheet.department,
+                    product: sheet.productName,
+                    quantity: sheet.approvedQuantity,
+                    uom: sheet.uom,
+                    vendorType: sheet.vendorType as VendorUpdateData['vendorType'],
+                }))
+        );
+    }, [indentSheet, user.firmNameMatch]);
+
+    useEffect(() => {
+        // Pehle firm name se filter karo
+        const filteredByFirm = indentSheet.filter(sheet =>
+            user.firmNameMatch.toLowerCase() === "all" || sheet.firmName === user.firmNameMatch
+        );
+
+        setHistoryData(
+            filteredByFirm
+                .filter((sheet) => sheet.planned2 !== '' && sheet.actual2 !== '')
+                .map((sheet) => ({
+                    date: formatDate(new Date(sheet.actual2)),
+                    indentNo: sheet.indentNumber,
+                    firmNameMatch: sheet.firmNameMatch || '',
+                    indenter: sheet.indenterName,
+                    department: sheet.department,
+                    product: sheet.productName,
+                    quantity: sheet.quantity,
+                    uom: sheet.uom,
+                    rate: sheet.approvedRate || 0,
+                    vendorType: sheet.vendorType as HistoryData['vendorType'],
+                }))
+                // Sort by indentNo in descending order (newest first)
+                .sort((a, b) => {
+                    return b.indentNo.localeCompare(a.indentNo);
+                })
+        );
+    }, [indentSheet, user.firmNameMatch]);
 
     const handleEditClick = (row: HistoryData) => {
         setEditingRow(row.indentNo);
@@ -224,9 +201,9 @@ useEffect(() => {
             header: 'Indent No.',
         },
         {
-        accessorKey: 'firmNameMatch', // Add this line
-        header: 'Firm Name',
-    },
+            accessorKey: 'firmNameMatch', // Add this line
+            header: 'Firm Name',
+        },
         {
             accessorKey: 'indenter',
             header: 'Indenter',
@@ -299,9 +276,9 @@ useEffect(() => {
             header: 'Indent No.',
         },
         {
-        accessorKey: 'firmNameMatch', // Add this line
-        header: 'Firm Name',
-    },
+            accessorKey: 'firmNameMatch', // Add this line
+            header: 'Firm Name',
+        },
         {
             accessorKey: 'indenter',
             header: 'Indenter',
@@ -454,6 +431,10 @@ useEffect(() => {
             ]
             : []),
     ];
+    // Regular vendor form se pehle
+    console.log("Selected Indent:", selectedIndent);
+    console.log("Available Vendors:", options?.vendors);
+    console.log("Available Payment Terms:", options?.paymentTerms);
 
     // Creating Regular Vendor form
     const regularSchema = z.object({
@@ -461,6 +442,7 @@ useEffect(() => {
         rate: z.coerce.number().gt(0),
         paymentTerm: z.string().nonempty(),
     });
+
 
     const regularForm = useForm<z.infer<typeof regularSchema>>({
         resolver: zodResolver(regularSchema),
@@ -658,7 +640,7 @@ useEffect(() => {
                         <DataTable
                             data={tableData}
                             columns={columns}
-                            searchFields={['product', 'department', 'indenter', 'vendorType','firmNameMatch']}
+                            searchFields={['product', 'department', 'indenter', 'vendorType', 'firmNameMatch']}
                             dataLoading={indentLoading}
                         />
                     </TabsContent>
@@ -914,27 +896,35 @@ useEffect(() => {
                                             name="vendorName"
                                             render={({ field }) => (
                                                 <FormItem>
+                                                    <FormLabel>Vendor Name</FormLabel>
                                                     <Select
                                                         onValueChange={field.onChange}
                                                         value={field.value}
                                                     >
-                                                        <FormLabel>Vendor Name</FormLabel>
                                                         <FormControl>
                                                             <SelectTrigger className="w-full">
                                                                 <SelectValue placeholder="Select vendor" />
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            {options?.vendors?.map(
-                                                                ({ vendorName }, i) => (
-                                                                    <SelectItem
-                                                                        key={i}
-                                                                        value={vendorName}
-                                                                    >
-                                                                        {vendorName}
-                                                                    </SelectItem>
-                                                                )
-                                                            )}
+                                                            <Input
+                                                                placeholder="Search vendor..."
+                                                                className="mb-2"
+                                                                onChange={(e) => {
+                                                                    const searchValue = e.target.value.toLowerCase();
+                                                                    const items = document.querySelectorAll('[role="option"]');
+                                                                    items.forEach((item) => {
+                                                                        const text = item.textContent?.toLowerCase() || '';
+                                                                        (item as HTMLElement).style.display =
+                                                                            text.includes(searchValue) ? 'flex' : 'none';
+                                                                    });
+                                                                }}
+                                                            />
+                                                            {options?.vendors?.map(({ vendorName }, i) => (
+                                                                <SelectItem key={i} value={vendorName}>
+                                                                    {vendorName}
+                                                                </SelectItem>
+                                                            ))}
                                                         </SelectContent>
                                                     </Select>
                                                 </FormItem>

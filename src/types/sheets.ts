@@ -179,6 +179,7 @@ export type Vendor = {
 
 export type MasterSheet = {
     vendors: Vendor[];
+    vendorNames: string[];
     paymentTerms: string[];
     departments: string[];
     groupHeads: Record<string, string[]>; // category: items[]
@@ -196,6 +197,8 @@ export type MasterSheet = {
     fmsNames: string[];
     firmCompanyMap: Record<string, { companyName: string; companyAddress: string }>;
 };
+
+
 
 export type UserPermissions = {
     rowIndex: number

@@ -116,73 +116,85 @@ export async function fetchSheet(
     //     }
 
 
-    if (sheetName === 'MASTER') {
-        const data = raw.options;
-        const length = Math.max(...Object.values(data).map((arr) => (arr as unknown[]).length));
+   if (sheetName === 'MASTER') {
+    const data = raw.options;
+    
+    console.log("🔍 Raw Master Sheet Data:", data);
+    console.log("🔍 vendorName column data:", data.vendorName);
+    
+    const length = Math.max(...Object.values(data).map((arr) => (arr as unknown[]).length));
+    console.log("📏 Total rows:", length);
 
-        const vendors: Vendor[] = [];
-        const groupHeads: Record<string, Set<string>> = {};
-        const departments = new Set<string>();
-        const paymentTerms = new Set<string>();
-        const defaultTerms = new Set<string>();
-        const uoms = new Set<string>();
-        const firms = new Set<string>();
-        const fmsNames = new Set<string>();
-        const firmCompanyMap: Record<string, { companyName: string; companyAddress: string }> = {}; // ADD THIS
+    const vendors: Vendor[] = [];
+    const groupHeads: Record<string, Set<string>> = {};
+    const departments = new Set<string>();
+    const paymentTerms = new Set<string>();
+    const defaultTerms = new Set<string>();
+    const uoms = new Set<string>();
+    const firms = new Set<string>();
+    const fmsNames = new Set<string>();
+    const firmCompanyMap: Record<string, { companyName: string; companyAddress: string }> = {};
 
-        for (let i = 0; i < length; i++) {
-            const vendorName = data.vendorName?.[i];
-            const gstin = data.vendorGstin?.[i];
-            const address = data.vendorAddress?.[i];
-            const email = data.vendorEmail?.[i];
-            if (vendorName && gstin && address) {
-                vendors.push({ vendorName, gstin, address, email });
-            }
-
-            if (data.department?.[i]) departments.add(data.department[i]);
-            if (data.paymentTerm?.[i]) paymentTerms.add(data.paymentTerm[i]);
-            if (data.defaultTerms?.[i]) defaultTerms.add(data.defaultTerms[i])
-            if (data.uom?.[i]) uoms.add(data.uom[i]);
-            if (data.firmName?.[i]) firms.add(data.firmName[i]);
-            if (data.fmsName?.[i]) fmsNames.add(data.fmsName[i]);
-
-            // ADD THIS: Map firm name to company details
-            const firmName = data.firmName?.[i];
-            const companyName = data.companyName?.[i];
-            const companyAddress = data.companyAddress?.[i];
-            console.log(`Row ${i}:`, { firmName, companyName, companyAddress });
-            if (firmName && companyName && companyAddress) {
-                firmCompanyMap[firmName] = { companyName, companyAddress };
-            }
-
-            const group = data.groupHead?.[i];
-            const item = data.itemName?.[i];
-            if (group && item) {
-                if (!groupHeads[group]) groupHeads[group] = new Set();
-                groupHeads[group].add(item);
-            }
+    for (let i = 0; i < length; i++) {
+        const vendorName = data.vendorName?.[i];
+        const gstin = data.vendorGstin?.[i];
+        const address = data.vendorAddress?.[i];
+        const email = data.vendorEmail?.[i];
+        
+        // ✅ CHANGED: Sirf vendorName check karo
+        if (vendorName) {
+            vendors.push({ 
+                vendorName, 
+                gstin: gstin || '', 
+                address: address || '', 
+                email: email || '' 
+            });
         }
 
-        return {
-            vendors,
-            departments: [...departments],
-            paymentTerms: [...paymentTerms],
-            groupHeads: Object.fromEntries(Object.entries(groupHeads).map(([k, v]) => [k, [...v]])),
-            companyPan: data.companyPan,
-            companyName: data.companyName,
-            companyAddress: data.companyAddress,
-            companyPhone: data.companyPhone,
-            companyGstin: data.companyGstin,
-            billingAddress: data.billingAddress,
-            destinationAddress: data.destinationAddress,
-            defaultTerms: [...defaultTerms],
-            uoms: [...uoms],
-            firms: [...firms],
-            fmsNames: [...fmsNames],
-            firmCompanyMap, // ADD THIS
-            firmsnames: data.firmsnames ?? [], // Add this line to satisfy MasterSheet type
-        };
+        if (data.department?.[i]) departments.add(data.department[i]);
+        if (data.paymentTerm?.[i]) paymentTerms.add(data.paymentTerm[i]);
+        if (data.defaultTerms?.[i]) defaultTerms.add(data.defaultTerms[i])
+        if (data.uom?.[i]) uoms.add(data.uom[i]);
+        if (data.firmName?.[i]) firms.add(data.firmName[i]);
+        if (data.fmsName?.[i]) fmsNames.add(data.fmsName[i]);
+
+        const firmName = data.firmName?.[i];
+        const companyName = data.companyName?.[i];
+        const companyAddress = data.companyAddress?.[i];
+        if (firmName && companyName && companyAddress) {
+            firmCompanyMap[firmName] = { companyName, companyAddress };
+        }
+
+        const group = data.groupHead?.[i];
+        const item = data.itemName?.[i];
+        if (group && item) {
+            if (!groupHeads[group]) groupHeads[group] = new Set();
+            groupHeads[group].add(item);
+        }
     }
+
+    console.log("📦 FINAL - Total vendors parsed:", vendors.length);
+
+    return {
+        vendors,
+        departments: [...departments],
+        paymentTerms: [...paymentTerms],
+        groupHeads: Object.fromEntries(Object.entries(groupHeads).map(([k, v]) => [k, [...v]])),
+        companyPan: data.companyPan,
+        companyName: data.companyName,
+        companyAddress: data.companyAddress,
+        companyPhone: data.companyPhone,
+        companyGstin: data.companyGstin,
+        billingAddress: data.billingAddress,
+        destinationAddress: data.destinationAddress,
+        defaultTerms: [...defaultTerms],
+        uoms: [...uoms],
+        firms: [...firms],
+        fmsNames: [...fmsNames],
+        firmCompanyMap,
+        firmsnames: data.firmsnames ?? [],
+    };
+}
     return raw.rows.filter((r: IndentSheet) => r.timestamp !== '');
 }
 
