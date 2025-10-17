@@ -14,6 +14,8 @@ import { SheetsProvider } from './context/SheetsContext';
 import VendorUpdate from './components/views/VendorUpdate';
 import RateApproval from './components/views/RateApproval';
 import StoreOutApproval from './components/views/StoreOutApproval';
+import TrainnigVideo from './components/views/TrainingVideo';
+import Liecense from './components/views/License'
 import type { RouteAttributes } from './types';
 import {
     LayoutDashboard,
@@ -28,6 +30,8 @@ import {
     ListTodo,
     Package2,
     Store,
+    KeyRound,
+    VideoIcon,
 } from 'lucide-react';
 import type { UserPermissions } from './types/sheets';
 import Administration from './components/views/Administration';
@@ -331,7 +335,23 @@ const routes: RouteAttributes[] = [
         element: <Administration />,
         notifications: () => 0,
     },
+{
+        path:'training-video',
+        // gateKey:'trainingVideoView',
+        name:'Training Video',
+        icon:<VideoIcon size={20}/>,
+        element:<TrainnigVideo/>,
+        notifications: () => 0,
+    },
+    {
+        path:'license',
+        // gateKey:'licenseView',
+        name:'License',
+        icon:<KeyRound size={20}/>,
+        element:<Liecense/>,
+        notifications: () => 0,
 
+    },
 
 ];
 
