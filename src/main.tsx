@@ -224,7 +224,7 @@ const routes: RouteAttributes[] = [
     {
         path: 'Quality-Check-In-Received-Item',
         gateKey: 'insteadOfQualityCheckInReceivedItem',
-        name: 'Instead of Quality Check In Received Item',
+        name: 'Reject For GRN',
         icon: <Users size={20} />,
         element: <QuantityCheckInReceiveItem />,
         notifications: () => 0,

@@ -97,31 +97,62 @@ export default () => {
     //     );
     // }, [indentSheet]);
 
-    useEffect(() => {
-        // Pehle firm name se filter karo (case-insensitive)
-        const filteredByFirm = indentSheet.filter(sheet =>
-            user.firmNameMatch.toLowerCase() === "all" || sheet.firmNameMatch === user.firmNameMatch
-        );
+const [vendorOptions, setVendorOptions] = useState<string[]>([]);
 
-        setTableData(
-            filteredByFirm
-                .filter((sheet) => sheet.liftingStatus === 'Pending')
-                .map((sheet) => ({
-                    indentNo: sheet.indentNumber,
-                    indenter: sheet.indenterName,
-                    department: sheet.department,
-                    product: sheet.productName,
-                    quantity: sheet.pendingLiftQty,
-                    uom: sheet.uom,
-                    poNumber: sheet.poNumber,
-                    firmNameMatch: sheet.firmNameMatch || '',
-                    receivedQty: sheet.receivedQty || 0,
-                    pendingPoQty: sheet.pendingPoQty || 0,
-                }))
-        );
-    }, [indentSheet, user.firmNameMatch]);
+// Fetch vendor options from MASTER sheet
+useEffect(() => {
+    const fetchVendorOptions = async () => {
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_APP_SCRIPT_URL}?sheetName=MASTER`
+            );
+            const data = await response.json();
+            if (data.success && data.options) {
+                // Assuming the vendor names are in a field called 'vendorName' or similar
+                // Adjust the key based on the actual column header in your MASTER sheet
+                setVendorOptions(data.options.vendorName || []);
+            }
+        } catch (error) {
+            console.error('Failed to fetch vendor options:', error);
+            toast.error('Failed to load vendor options');
+        }
+    };
+    
+    fetchVendorOptions();
+}, []);
 
 
+
+   useEffect(() => {
+    // Pehle firm name se filter karo (case-insensitive)
+    const filteredByFirm = indentSheet.filter(sheet =>
+        user.firmNameMatch.toLowerCase() === "all" || sheet.firmNameMatch === user.firmNameMatch
+    );
+
+    setTableData(
+        filteredByFirm
+            .filter((sheet) => {
+                // Show only when:
+                // 1. liftingStatus (column BQ) is "Pending"
+                // 2. AND planned7 (column BB) is not null/empty
+                return sheet.liftingStatus === 'Pending' && 
+                       sheet.planned5 && 
+                       sheet.planned5.toString().trim() !== '';
+            })
+            .map((sheet) => ({
+                indentNo: sheet.indentNumber,
+                indenter: sheet.indenterName,
+                department: sheet.department,
+                product: sheet.productName,
+                quantity: sheet.pendingLiftQty,
+                uom: sheet.uom,
+                poNumber: sheet.poNumber,
+                firmNameMatch: sheet.firmNameMatch || '',
+                receivedQty: sheet.receivedQty || 0,
+                pendingPoQty: sheet.pendingPoQty || 0,
+            }))
+    );
+}, [indentSheet, user.firmNameMatch]);
     // useEffect(() => {
     //     setHistoryData(
     //         storeInSheet
@@ -191,48 +222,54 @@ export default () => {
     // }, [storeInSheet, indentSheet]); // indentSheet bhi dependency mein add karo
 
 
-    useEffect(() => {
-        // Pehle firm name se filter karo (case-insensitive)
-        const filteredByFirm = indentSheet.filter(sheet =>
-            user.firmNameMatch.toLowerCase() === "all" || sheet.firmName === user.firmNameMatch
-        );
+   useEffect(() => {
+    // Pehle firm name se filter karo (case-insensitive)
+    const filteredByFirm = indentSheet.filter(sheet =>
+        user.firmNameMatch.toLowerCase() === "all" || sheet.firmName === user.firmNameMatch
+    );
 
-        // Pehle wo indent numbers nikaalo jinki lifting status complete hai
-        const completedIndentNumbers = filteredByFirm
-            .filter(sheet => sheet.liftingStatus === 'Complete')
-            .map(sheet => sheet.indentNumber);
+    // Pehle wo indent numbers nikaalo jinki lifting status complete hai
+    // AND planned5 (column BB) is not null
+    const completedIndentNumbers = filteredByFirm
+        .filter(sheet => {
+            return sheet.liftingStatus === 'Complete' && 
+                   sheet.planned5 && 
+                   sheet.planned5.toString().trim() !== '';
+        })
+        .map(sheet => sheet.indentNumber);
 
-        // Ab storeInSheet se sirf wahi data dikhao jo completed indents se match kare
-        setHistoryData(
-            storeInSheet
-                .filter(sheet => completedIndentNumbers.includes(sheet.indentNo))
-                .map((sheet) => ({
-                    liftNumber: sheet.liftNumber || '',
-                    indentNo: sheet.indentNo || '',
-                    poNumber: sheet.poNumber || '',
-                    vendorName: sheet.vendorName || '',
-                    productName: sheet.productName || '',
-                    firmNameMatch: sheet.firmNameMatch || '',
-                    billStatus: sheet.billStatus || '',
-                    billNo: sheet.billNo || '',
-                    qty: sheet.qty || 0,
-                    leadTime: sheet.leadTimeToLiftMaterial || 0,
-                    typeOfBill: sheet.typeOfBill || '',
-                    billAmount: sheet.billAmount || 0,
-                    discountAmount: sheet.discountAmount || 0,
-                    paymentType: sheet.paymentType || '',
-                    advanceAmount: Number(sheet.advanceAmountIfAny) || 0,
-                    photoOfBill: sheet.photoOfBill || '',
-                    transportationInclude: sheet.transportationInclude || '',
-                    transporterName: sheet.transporterName || '',
-                    vehicleNo: sheet.vehicleNo || '',
-                    driverName: sheet.driverName || '',
-                    driverMobileNo: sheet.driverMobileNo || '',
-                    amount: sheet.amount || 0,
-                }))
-                .sort((a, b) => b.indentNo.localeCompare(a.indentNo))
-        );
-    }, [storeInSheet, indentSheet, user.firmNameMatch]); // user.firmNameMatch bhi dependency mein add karo
+    // Ab storeInSheet se sirf wahi data dikhao jo completed indents se match kare
+    setHistoryData(
+        storeInSheet
+            .filter(sheet => completedIndentNumbers.includes(sheet.indentNo))
+            .map((sheet) => ({
+                liftNumber: sheet.liftNumber || '',
+                indentNo: sheet.indentNo || '',
+                poNumber: sheet.poNumber || '',
+                vendorName: sheet.vendorName || '',
+                productName: sheet.productName || '',
+                firmNameMatch: sheet.firmNameMatch || '',
+                billStatus: sheet.billStatus || '',
+                billNo: sheet.billNo || '',
+                qty: sheet.qty || 0,
+                leadTime: sheet.leadTimeToLiftMaterial || 0,
+                typeOfBill: sheet.typeOfBill || '',
+                billAmount: sheet.billAmount || 0,
+                discountAmount: sheet.discountAmount || 0,
+                paymentType: sheet.paymentType || '',
+                advanceAmount: Number(sheet.advanceAmountIfAny) || 0,
+                photoOfBill: sheet.photoOfBill || '',
+                transportationInclude: sheet.transportationInclude || '',
+                transporterName: sheet.transporterName || '',
+                vehicleNo: sheet.vehicleNo || '',
+                driverName: sheet.driverName || '',
+                driverMobileNo: sheet.driverMobileNo || '',
+                amount: sheet.amount || 0,
+            }))
+            .sort((a, b) => b.indentNo.localeCompare(a.indentNo))
+    );
+}, [storeInSheet, indentSheet, user.firmNameMatch]);
+
 
     // Creating table columns
     const columns: ColumnDef<GetPurchaseData>[] = [
@@ -620,20 +657,31 @@ export default () => {
 
 
                                             <FormField
-                                                control={form.control}
-                                                name="vendorName"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Vendor Name</FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                placeholder="Enter vendor name"
-                                                                {...field}
-                                                            />
-                                                        </FormControl>
-                                                    </FormItem>
-                                                )}
-                                            />
+                                                        control={form.control}
+                                                        name="vendorName"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel>Vendor Name</FormLabel>
+                                                                <Select
+                                                                    onValueChange={field.onChange}
+                                                                    value={field.value}
+                                                                >
+                                                                    <FormControl>
+                                                                        <SelectTrigger>
+                                                                            <SelectValue placeholder="Select vendor name" />
+                                                                        </SelectTrigger>
+                                                                    </FormControl>
+                                                                    <SelectContent>
+                                                                        {vendorOptions.map((vendor) => (
+                                                                            <SelectItem key={vendor} value={vendor}>
+                                                                                {vendor}
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </FormItem>
+                                                        )}
+                                                    />
 
                                             <FormField
                                                 control={form.control}

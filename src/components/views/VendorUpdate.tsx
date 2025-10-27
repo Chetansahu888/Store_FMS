@@ -37,6 +37,8 @@ interface VendorUpdateData {
     quantity: number;
     uom: string;
     vendorType: 'Three Party' | 'Regular';
+    planned2: string;
+    actual2: string;
 }
 interface HistoryData {
     indentNo: string;
@@ -49,6 +51,8 @@ interface HistoryData {
     vendorType: 'Three Party' | 'Regular';
     date: string;
     lastUpdated?: string;
+    planned2: string;
+    actual2: string;
 }
 
 export default () => {
@@ -96,6 +100,7 @@ export default () => {
                     quantity: sheet.approvedQuantity,
                     uom: sheet.uom,
                     vendorType: sheet.vendorType as VendorUpdateData['vendorType'],
+                    planned2: sheet.planned2,
                 }))
         );
     }, [indentSheet, user.firmNameMatch]);
@@ -120,6 +125,8 @@ export default () => {
                     uom: sheet.uom,
                     rate: sheet.approvedRate || 0,
                     vendorType: sheet.vendorType as HistoryData['vendorType'],
+                    planned2: sheet.planned2, // ✅ Added
+    actual2: sheet.actual2,   // ✅ Added
                 }))
                 // Sort by indentNo in descending order (newest first)
                 .sort((a, b) => {
@@ -238,6 +245,7 @@ export default () => {
                 return <Pill variant={variant}>{status}</Pill>;
             },
         },
+        { accessorKey: 'planned2', header: 'Planned Date', cell: ({ row }) => formatDateTime(row.original.planned2) },
     ];
 
     const historyColumns: ColumnDef<HistoryData>[] = [
@@ -407,6 +415,24 @@ export default () => {
                 );
             },
         },
+
+        {
+  accessorKey: 'planned2',
+  header: 'Planned Date',
+  cell: ({ row }) =>
+    row.original.planned2
+      ? formatDateTime(row.original.planned2)
+      : '-',
+},
+{
+  accessorKey: 'actual2',
+  header: 'Actual Date',
+  cell: ({ row }) =>
+    row.original.actual2
+      ? formatDateTime(row.original.actual2)
+      : '-',
+},
+
         ...(user.updateVendorAction
             ? [
                 {
@@ -579,6 +605,19 @@ export default () => {
             toast.error('Failed to update vendor');
         }
     }
+
+    const formatDateTime = (isoString?: string) => {
+  if (!isoString) return '-';
+  const date = new Date(isoString);
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear();
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const seconds = date.getSeconds().toString().padStart(2, "0");
+  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+};
+
 
     // History Update form
     const historyUpdateSchema = z.object({

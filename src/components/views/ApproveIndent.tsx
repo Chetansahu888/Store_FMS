@@ -46,6 +46,7 @@ interface ApproveTableData {
     specifications: string;
     indentStatus: string;
     noDay: number;
+    planned1: string;
 }
 
 interface HistoryData {
@@ -62,6 +63,8 @@ interface HistoryData {
     lastUpdated?: string;
     indentStatus: string;
     noDay: number;
+    planned1: string;
+    actual1: string;
 }
 
 export default () => {
@@ -83,60 +86,6 @@ export default () => {
     const [editValues, setEditValues] = useState<Partial<HistoryData>>({});
     const [loading, setLoading] = useState(false);
 
-    // Fetching table data
-    // useEffect(() => {
-    //     setTableData(
-    //         indentSheet
-    //             .filter(
-    //                 (sheet) =>
-    //                     sheet.planned1 !== '' &&
-    //                     sheet.actual1 === '' &&
-    //                     sheet.indentType === 'Purchase'
-    //             )
-    //             .map((sheet) => ({
-    //                 indentNo: sheet.indentNumber,
-    //                 indenter: sheet.indenterName,
-    //                 department: sheet.department,
-    //                 product: sheet.productName,
-    //                 quantity: sheet.quantity,
-    //                 uom: sheet.uom,
-    //                 attachment: sheet.attachment,
-    //                 specifications: sheet.specifications || '',
-    //                 vendorType: sheet.vendorType as ApproveTableData['vendorType'],
-    //                 date: formatDate(new Date(sheet.timestamp)),
-    //                 indentStatus: sheet.indentStatus || '',
-    //                 noDay: sheet.noDay || 0,
-    //             }))
-    //     );
-    //     setHistoryData(
-    //         indentSheet
-    //             .filter(
-    //                 (sheet) =>
-    //                     sheet.planned1 !== '' &&
-    //                     sheet.actual1 !== '' &&
-    //                     sheet.indentType === 'Purchase'
-    //             )
-    //             .map((sheet) => ({
-    //                 indentNo: sheet.indentNumber,
-    //                 indenter: sheet.indenterName,
-    //                 department: sheet.department,
-    //                 product: sheet.productName,
-    //                 approvedQuantity: sheet.approvedQuantity || sheet.quantity,
-    //                 vendorType: sheet.vendorType as HistoryData['vendorType'],
-    //                 uom: sheet.uom,
-    //                 specifications: sheet.specifications || '',
-    //                 date: formatDate(new Date(sheet.timestamp)),
-    //                 approvedDate: formatDate(new Date(sheet.actual1)),
-    //                 indentStatus: sheet.indentStatus || '',
-    //                 noDay: sheet.noDay || 0,
-    //                 // lastUpdated: sheet.lastUpdated,
-    //             }))
-    //             // Sort by indentNo in descending order (newest first)
-    //             .sort((a, b) => {
-    //                 return b.indentNo.localeCompare(a.indentNo);
-    //             })
-    //     );
-    // }, [indentSheet]);
 
 
     // Fetching table data
@@ -168,6 +117,7 @@ useEffect(() => {
                 date: formatDate(new Date(sheet.timestamp)),
                 indentStatus: sheet.indentStatus || '',
                 noDay: sheet.noDay || 0,
+                planned1: sheet.planned1,
             }))
     );
 }, [indentSheet, user.firmNameMatch]);
@@ -200,6 +150,8 @@ useEffect(() => {
                 approvedDate: formatDate(new Date(sheet.actual1)),
                 indentStatus: sheet.indentStatus || '',
                 noDay: sheet.noDay || 0,
+                planned1: sheet.planned1, // ✅ Added
+    actual1: sheet.actual1,   // ✅ Added
             }))
             // Sort by indentNo in descending order (newest first)
             .sort((a, b) => {
@@ -428,6 +380,14 @@ useEffect(() => {
             },
         },
         { accessorKey: 'date', header: 'Date' },
+        {
+  accessorKey: 'planned1',
+  header: 'Planned Date',
+  cell: ({ row }) =>
+    row.original.planned1
+      ? formatDateTime(row.original.planned1)
+      : '-',
+}
     ];
 
     const historyColumns: ColumnDef<HistoryData>[] = [
@@ -580,6 +540,23 @@ useEffect(() => {
         },
         { accessorKey: 'date', header: 'Request Date' },
         { accessorKey: 'approvedDate', header: 'Approval Date' },
+        {
+  accessorKey: 'planned1',
+  header: 'Planned Date',
+  cell: ({ row }) =>
+    row.original.planned1
+      ? formatDateTime(row.original.planned1)
+      : '-',
+},
+{
+  accessorKey: 'actual1',
+  header: 'Actual Date',
+  cell: ({ row }) =>
+    row.original.actual1
+      ? formatDateTime(row.original.actual1)
+      : '-',
+},
+
         ...(user.indentApprovalAction
             ? [
                 {
@@ -666,6 +643,19 @@ useEffect(() => {
         console.log(e);
         toast.error('Please fill all required fields');
     }
+
+    const formatDateTime = (isoString?: string) => {
+  if (!isoString) return '-';
+  const date = new Date(isoString);
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear();
+  const hours = date.getHours().toString().padStart(2, "0");
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const seconds = date.getSeconds().toString().padStart(2, "0");
+  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+};
+
 
     return (
         <div>

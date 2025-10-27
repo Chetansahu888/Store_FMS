@@ -53,6 +53,7 @@ function generatePoNumber(poNumbers: string[], today = new Date()): string {
     return `${prefix}${next}`;
 }
 
+
 function incrementPoRevision(poNumber: string, allPOs: PoMasterSheet[]): string {
     const parts = poNumber.split('/');
     const lastSegment = parts[parts.length - 1];
@@ -110,13 +111,6 @@ export default () => {
     const [firmCompanyAddress, setFirmCompanyAddress] = useState('');
 
 
-
-    // Initialize destination address from details
-    // useEffect(() => {
-    //     if (details?.destinationAddress) {
-    //         setDestinationAddress(details.destinationAddress);
-    //     }
-    // }, [details]);
 
     useEffect(() => {
         if (details?.destinationAddress) {
@@ -180,6 +174,8 @@ export default () => {
             numberOfDays: undefined,
         },
     });
+
+
 
     useEffect(() => {
         if (details) {
@@ -256,61 +252,76 @@ export default () => {
         }
     }, [mode]);
 
-    useEffect(() => {
-        if (vendor && mode === 'create') {
-            const items = indentSheet.filter(
-                (i) => i.planned4 !== '' && i.actual4 === '' && i.approvedVendorName === vendor
-            );
+useEffect(() => {
+    if (vendor && mode === 'create') {
+        const items = indentSheet.filter(
+            (i) => i.planned4 !== '' && i.actual4 === '' && i.approvedVendorName === vendor
+        );
 
-            // Get firm name from the first matching indent
-            const firmName = items[0]?.firmName;
+        // Get firm name from the first matching indent
+        const firmName = items[0]?.firmName;
 
-            // Fetch company details based on firm name (CASE-INSENSITIVE)
-            if (firmName && details?.firmCompanyMap) {
-                // Try exact match first
-                let companyDetails = details.firmCompanyMap[firmName];
+        // Fetch company details based on firm name (CASE-INSENSITIVE)
+        if (firmName && details?.firmCompanyMap) {
+            // Try exact match first
+            let companyDetails = details.firmCompanyMap[firmName];
 
-                // If not found, try case-insensitive match
-                if (!companyDetails) {
-                    const firmKey = Object.keys(details.firmCompanyMap).find(
-                        key => key.toLowerCase().trim() === firmName.toLowerCase().trim()
-                    );
-                    if (firmKey) {
-                        companyDetails = details.firmCompanyMap[firmKey];
-                    }
-                }
-
-                if (companyDetails) {
-                    setFirmCompanyName(companyDetails.companyName);
-                    setFirmCompanyAddress(companyDetails.companyAddress);
-                } else {
-                    // Reset to default
-                    setFirmCompanyName('');
-                    setFirmCompanyAddress('');
+            // If not found, try case-insensitive match
+            if (!companyDetails) {
+                const firmKey = Object.keys(details.firmCompanyMap).find(
+                    key => key.toLowerCase().trim() === firmName.toLowerCase().trim()
+                );
+                if (firmKey) {
+                    companyDetails = details.firmCompanyMap[firmKey];
                 }
             }
 
-            form.setValue(
-                'supplierAddress',
-                details?.vendors.find((v) => v.vendorName === vendor)?.address || ''
-            );
-            form.setValue(
-                'gstin',
-                details?.vendors.find((v) => v.vendorName === vendor)?.gstin || ''
-            );
-            form.setValue(
-                'indents',
-                items.map((i) => ({
-                    indentNumber: i.indentNumber,
-                    gst: 18,
-                    discount: 0,
-                    quantity: i.approvedQuantity,
-                    unit: i.uom,
-                    rate: i.approvedRate,
-                }))
-            );
+            if (companyDetails) {
+                setFirmCompanyName(companyDetails.companyName);
+                setFirmCompanyAddress(companyDetails.companyAddress);
+
+                // ✅ ADD THIS - Update destination address
+                if (companyDetails.destinationAddress) {
+                    setDestinationAddress(companyDetails.destinationAddress);
+                } else {
+                    // Fallback to default if firm-specific address not available
+                    setDestinationAddress(details?.destinationAddress || '');
+                }
+            } else {
+                // Reset to default
+                setFirmCompanyName('');
+                setFirmCompanyAddress('');
+                setDestinationAddress(details?.destinationAddress || ''); // ✅ ADD THIS
+            }
+        } else {
+            // Reset to default when no firmName
+            setFirmCompanyName('');
+            setFirmCompanyAddress('');
+            setDestinationAddress(details?.destinationAddress || ''); // ✅ ADD THIS
         }
-    }, [vendor, details, indentSheet, mode]);
+
+        form.setValue(
+            'supplierAddress',
+            details?.vendors.find((v) => v.vendorName === vendor)?.address || ''
+        );
+        form.setValue(
+            'gstin',
+            details?.vendors.find((v) => v.vendorName === vendor)?.gstin || ''
+        );
+        form.setValue(
+            'indents',
+            items.map((i) => ({
+                indentNumber: i.indentNumber,
+                gst: 18,
+                discount: 0,
+                quantity: i.approvedQuantity,
+                unit: i.uom,
+                rate: i.approvedRate,
+            }))
+        );
+    }
+}, [vendor, details, indentSheet, mode]);
+
 
     useEffect(() => {
         const po = poMasterSheet.find((p) => p.poNumber === poNumber)!;
@@ -1029,95 +1040,111 @@ export default () => {
 
                             <hr />
 
-                            <div className="grid md:grid-cols-3 gap-3">
-                                <Card className="p-0 gap-0 shadow-xs rounded-[3px]">
-                                    <CardHeader className="bg-muted px-5 py-2">
-                                        <CardTitle className="text-center">
-                                            Our Commercial Details
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="p-5 text-sm">
-                                        <p>
-                                            <span className="font-medium">GSTIN</span>{' '}
-                                            {details?.companyGstin}
-                                        </p>
-                                        <p>
-                                            <span className="font-medium">Pan No.</span>{' '}
-                                            {details?.companyPan}
-                                        </p>
-                                    </CardContent>
-                                </Card>
-                                <Card className="p-0 gap-0 shadow-xs rounded-[3px]">
-                                    <CardHeader className="bg-muted px-5 py-2">
-                                        <CardTitle className="text-center">
-                                            Billing Address
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="p-5 text-sm">
-                                        <p>M/S {details?.companyName}</p>
-                                        <p>{details?.billingAddress}</p>
-                                    </CardContent>
-                                </Card>
-                                <Card className="p-0 gap-0 shadow-xs rounded-[3px]">
-                                    <CardHeader className="bg-muted px-5 py-2">
-                                        <CardTitle className="text-center flex items-center justify-between">
-                                            Destination Address
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={
-                                                    isEditingDestination
-                                                        ? handleDestinationSave
-                                                        : handleDestinationEdit
-                                                }
-                                                className="h-6 w-6 p-0 hover:bg-gray-200"
-                                            >
-                                                {isEditingDestination ? (
-                                                    <Save size={14} className="text-green-600" />
-                                                ) : (
-                                                    <Pencil size={14} className="text-gray-600" />
-                                                )}
-                                            </Button>
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="p-5 text-sm">
-                                        <p>M/S {details?.companyName}</p>
-                                        {isEditingDestination ? (
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <Input
-                                                    value={destinationAddress}
-                                                    onChange={(e) =>
-                                                        setDestinationAddress(e.target.value)
-                                                    }
-                                                    className="h-7 text-sm"
-                                                    placeholder="Enter destination address"
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') {
-                                                            handleDestinationSave();
-                                                        } else if (e.key === 'Escape') {
-                                                            handleDestinationCancel();
-                                                        }
-                                                    }}
-                                                    autoFocus
-                                                />
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={handleDestinationCancel}
-                                                    className="h-6 w-6 p-0 hover:bg-red-100"
-                                                >
-                                                    <Trash size={12} className="text-red-500" />
-                                                </Button>
-                                            </div>
-                                        ) : (
-                                            <p>{destinationAddress}</p>
-                                        )}
-                                    </CardContent>
-                                </Card>
-                            </div>
-
+<div className="grid md:grid-cols-3 gap-3">
+    <Card className="p-0 gap-0 shadow-xs rounded-[3px]">
+        <CardHeader className="bg-muted px-5 py-2">
+            <CardTitle className="text-center">
+                Our Commercial Details
+            </CardTitle>
+        </CardHeader>
+        <CardContent className="p-5 text-sm">
+            <p>
+                <span className="font-medium">GSTIN</span>{' '}
+                {details?.companyGstin}
+            </p>
+            <p>
+                <span className="font-medium">Pan No.</span>{' '}
+                {details?.companyPan}
+            </p>
+        </CardContent>
+    </Card>
+    
+    <Card className="p-0 gap-0 shadow-xs rounded-[3px]">
+        <CardHeader className="bg-muted px-5 py-2">
+            <CardTitle className="text-center">
+                Billing Address
+            </CardTitle>
+        </CardHeader>
+        <CardContent className="p-5 text-sm">
+            {vendor ? (
+                <>
+                    <p>M/S {firmCompanyName || details?.companyName}</p>
+                    <p>{firmCompanyAddress || details?.billingAddress}</p>
+                </>
+            ) : (
+                <p className="text-gray-400 text-center">Select Supplier</p>
+            )}
+        </CardContent>
+    </Card>
+    
+    <Card className="p-0 gap-0 shadow-xs rounded-[3px]">
+        <CardHeader className="bg-muted px-5 py-2">
+            <CardTitle className="text-center flex items-center justify-between">
+                Destination Address
+                {vendor && (
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={
+                            isEditingDestination
+                                ? handleDestinationSave
+                                : handleDestinationEdit
+                        }
+                        className="h-6 w-6 p-0 hover:bg-gray-200"
+                    >
+                        {isEditingDestination ? (
+                            <Save size={14} className="text-green-600" />
+                        ) : (
+                            <Pencil size={14} className="text-gray-600" />
+                        )}
+                    </Button>
+                )}
+            </CardTitle>
+        </CardHeader>
+        <CardContent className="p-5 text-sm">
+            {vendor ? (
+                <>
+                    <p>M/S {firmCompanyName || details?.companyName}</p>
+                    <p>{firmCompanyAddress || details?.billingAddress}</p>
+                    {isEditingDestination ? (
+                        <div className="flex items-center gap-2 mt-1">
+                            <Input
+                                value={destinationAddress}
+                                onChange={(e) =>
+                                    setDestinationAddress(e.target.value)
+                                }
+                                className="h-7 text-sm"
+                                placeholder="Enter destination address"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handleDestinationSave();
+                                    } else if (e.key === 'Escape') {
+                                        handleDestinationCancel();
+                                    }
+                                }}
+                                autoFocus
+                            />
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleDestinationCancel}
+                                className="h-6 w-6 p-0 hover:bg-red-100"
+                            >
+                                <Trash size={12} className="text-red-500" />
+                            </Button>
+                        </div>
+                    ) : (
+                        <p>{destinationAddress}</p>
+                    )}
+                </>
+            ) : (
+                <p className="text-gray-400 text-center">Select Supplier</p>
+            )}
+        </CardContent>
+    </Card>
+</div>
                             <hr />
 
                             <div>
@@ -1479,39 +1506,7 @@ export default () => {
                             <hr />
 
                             <div className="text-center flex justify-between gap-5 px-7 items-center">
-                                {/* <FormField
-                                    control={form.control}
-                                    name="preparedBy"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col justify-center items-center w-full">
-                                            <FormLabel>Prepared By</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    className="h-9 w-full text-center"
-                                                    placeholder="Purchase Order Prepared By"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                        </FormItem>
-                                    )}
-                                /> */}
-                                {/* <FormField
-                                    control={form.control}
-                                    name="approvedBy"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col justify-center items-center w-full">
-                                            <FormLabel>Approved By</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    className="h-9 w-full text-center"
-                                                    placeholder="Purchase Order Approved By"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                        </FormItem>
-                                    )}
-                                /> */}
-                                {/* <p className="break-words min-w-1/4">For {details?.companyName}</p> */}
+                            
                             </div>
                         </div>
 

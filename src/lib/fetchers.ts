@@ -206,36 +206,48 @@ export async function postToSheet(
         | Partial<UserPermissions>[]
         | Partial<PoMasterSheet>[]
         | Partial<StoreInSheet>[]
-
         | Partial<TallyEntrySheet>[]
         | Partial<PcReportSheet>[],
     action: 'insert' | 'update' | 'delete' = 'insert',
     sheet: Sheet = 'INDENT'
 ) {
-    const form = new FormData();
-    form.append('action', action);
-    form.append('sheetName', sheet);
-    form.append('rows', JSON.stringify(data));
+    try {
+        const form = new FormData();
+        form.append('action', action);
+        form.append('sheetName', sheet);
+        form.append('rows', JSON.stringify(data));
 
-    console.log("form", form);
+        console.log("form", form);
 
-    const response = await fetch(import.meta.env.VITE_APP_SCRIPT_URL, {
-        method: 'POST',
-        body: form,
-    });
-    if (!response.ok) {
-        console.error(`Error in fetch: ${response.status} - ${response.statusText}`);
-        throw new Error(`Failed to ${action} data`)
-    };
-    const res = await response.json();
-    if (!res.success) {
-        console.error(`Error in response: ${res.message}`);
-        throw new Error('Something went wrong in the API')
-    };
+        const response = await fetch(import.meta.env.VITE_APP_SCRIPT_URL, {
+            method: 'POST',
+            body: form,
+            redirect: 'follow', // ✅ Add this
+            mode: 'cors',       // ✅ Add this
+            credentials: 'omit' // ✅ Add this
+        });
+
+        // ✅ Handle response properly
+        if (!response.ok) {
+            console.error(`Error in fetch: ${response.status} - ${response.statusText}`);
+            throw new Error(`Failed to ${action} data`);
+        }
+
+        // ✅ Parse response as text first, then JSON
+        const textResponse = await response.text();
+        const res = JSON.parse(textResponse);
+        
+        if (!res.success) {
+            console.error(`Error in response: ${res.error || res.message}`);
+            throw new Error(res.error || 'Something went wrong in the API');
+        }
+
+        return res; // ✅ Return the result
+    } catch (error) {
+        console.error('Error in postToSheet:', error);
+        throw error;
+    }
 }
-
-
-
 
 export const postToIssueSheet = async (
     data: Partial<IssueSheet>[],

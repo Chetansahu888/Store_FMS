@@ -394,7 +394,7 @@ useEffect(() => {
             <Dialog open={openDialog} onOpenChange={setOpenDialog}>
                 <Tabs defaultValue="pending">
                     <Heading
-                        heading="Quantity Check-In & Receive Item"
+                        heading="Reject For GRN"
                         subtext="Process store items and manage returns"
                         tabs
                     >
