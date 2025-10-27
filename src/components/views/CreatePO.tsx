@@ -30,28 +30,27 @@ import POPdf, { type POPdfProps } from '../element/POPdf';
 import POMaster from './POMaster';
 
 function generatePoNumber(poNumbers: string[], today = new Date()): string {
-    // Step 1: Get financial year from today's date
-    const fyStart = today.getMonth() < 3 ? today.getFullYear() - 1 : today.getFullYear();
-    const fy = `${(fyStart % 100).toString().padStart(2, '0')}-${((fyStart + 1) % 100)
-        .toString()
-        .padStart(2, '0')}`;
+  // Step 1: Get financial year from today's date
+  const fyStart = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
+  const fy = `${(fyStart % 100).toString().padStart(2, '0')}-${((fyStart + 1) % 100)
+    .toString()
+    .padStart(2, '0')}`;
+  const prefix = `STORE-PO-${fy}-`;
 
-    const prefix = `STORE/PO/${fy}/`;
+  // Step 2: Extract and count existing numbers for current financial year
+  const numbersInFY = poNumbers
+    .filter(po => po.includes(fy))
+    .map(po => {
+      const match = po.match(/-(\d+)$/);
+      return match ? parseInt(match[1], 10) : null;
+    })
+    .filter(n => n !== null && n !== undefined);
 
-    // Step 2: Extract numbers for curre nt financial year
-    const numbersInFY = poNumbers
-        .filter((po) => po.includes(`/${fy}/`))
-        .map((po) => {
-            const match = po.match(/\/(\d+)(?:-\d+)?$/); // gets '80' from '80-2'
-            return match ? parseInt(match[1], 10) : null;
-        })
-        .filter((n): n is number => n !== null);
-
-    // Step 3: Determine next number
-    const next = numbersInFY.length > 0 ? Math.max(...numbersInFY) + 1 : 1;
-
-    return `${prefix}${next}`;
+  // Step 3: Use count + 1 for true sequential numbering
+  const next = numbersInFY.length + 1;
+  return `${prefix}${next}`;
 }
+
 
 
 function incrementPoRevision(poNumber: string, allPOs: PoMasterSheet[]): string {
