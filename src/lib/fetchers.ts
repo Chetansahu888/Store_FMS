@@ -161,8 +161,9 @@ export async function fetchSheet(
         const firmName = data.firmName?.[i];
         const companyName = data.companyName?.[i];
         const companyAddress = data.companyAddress?.[i];
-        if (firmName && companyName && companyAddress) {
-            firmCompanyMap[firmName] = { companyName, companyAddress };
+        const destinationAddress = data.destinationAddress?.[i];
+        if (firmName && companyName && companyAddress && destinationAddress) {
+            firmCompanyMap[firmName] = { companyName, companyAddress, destinationAddress };
         }
 
         const group = data.groupHead?.[i];
