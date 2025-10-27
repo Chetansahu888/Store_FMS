@@ -275,16 +275,14 @@ useEffect(() => {
                     companyDetails = details.firmCompanyMap[firmKey];
                 }
             }
-
             if (companyDetails) {
                 setFirmCompanyName(companyDetails.companyName);
                 setFirmCompanyAddress(companyDetails.companyAddress);
 
-                // ✅ ADD THIS - Update destination address
-                if (companyDetails.destinationAddress) {
-                    setDestinationAddress(companyDetails.destinationAddress);
+                // Prefer firm-specific destinationAddress when present; otherwise fall back to default
+                if ('destinationAddress' in companyDetails && (companyDetails as any).destinationAddress) {
+                    setDestinationAddress((companyDetails as any).destinationAddress);
                 } else {
-                    // Fallback to default if firm-specific address not available
                     setDestinationAddress(details?.destinationAddress || '');
                 }
             } else {

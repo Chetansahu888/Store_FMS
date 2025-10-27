@@ -31,6 +31,8 @@ import { formatDate } from '@/lib/utils';
 
 interface VendorUpdateData {
     indentNo: string;
+     firmNameMatch?: string; // ✅ Add this property
+
     indenter: string;
     department: string;
     product: string;
@@ -101,6 +103,7 @@ export default () => {
                     uom: sheet.uom,
                     vendorType: sheet.vendorType as VendorUpdateData['vendorType'],
                     planned2: sheet.planned2,
+                    actual2: sheet.actual2,
                 }))
         );
     }, [indentSheet, user.firmNameMatch]);

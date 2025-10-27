@@ -195,7 +195,7 @@ export type MasterSheet = {
     firmsnames: string[];
     firms: string[];
     fmsNames: string[];
-    firmCompanyMap: Record<string, { companyName: string; companyAddress: string }>;
+    firmCompanyMap: Record<string, { companyName: string; companyAddress: string; destinationAddress: string; }>;
 };
 
 

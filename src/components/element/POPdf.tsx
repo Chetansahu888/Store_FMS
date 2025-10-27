@@ -231,6 +231,7 @@ export interface POPdfProps {
     gstAmount: number;
     grandTotal: number;
     terms: string[];
+    
     // preparedBy?: string;
     // approvedBy?: string;
 }

@@ -133,7 +133,7 @@ export async function fetchSheet(
     const uoms = new Set<string>();
     const firms = new Set<string>();
     const fmsNames = new Set<string>();
-    const firmCompanyMap: Record<string, { companyName: string; companyAddress: string }> = {};
+    const firmCompanyMap: Record<string, { companyName: string; companyAddress: string; destinationAddress: string }> = {};
 
     for (let i = 0; i < length; i++) {
         const vendorName = data.vendorName?.[i];
