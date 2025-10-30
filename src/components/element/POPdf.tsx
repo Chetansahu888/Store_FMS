@@ -231,9 +231,6 @@ export interface POPdfProps {
     gstAmount: number;
     grandTotal: number;
     terms: string[];
-    
-    // preparedBy?: string;
-    // approvedBy?: string;
 }
 
 export default ({
@@ -259,8 +256,6 @@ export default ({
     gstAmount,
     grandTotal,
     terms,
-    // preparedBy,
-    // approvedBy,
 }: POPdfProps) => {
     return (
         <Document>
@@ -270,9 +265,8 @@ export default ({
                         <View style={styles.header}>
                             <Text style={styles.companyName}>{companyName}</Text>
                             <Text>{companyAddress}</Text>
-                            <Text>Phone: +{companyPhone}</Text>
+                            <Text>Phone: {companyPhone}</Text>
                         </View>
-
                         <View style={styles.divider} />
                     </View>
 
@@ -348,7 +342,6 @@ export default ({
                                 <Text style={styles.commercialHeaderText}>Billing Address</Text>
                             </View>
                             <View style={styles.commercialContent}>
-                                <Text style={styles.addressText}>M/S JAY {companyName}</Text>
                                 <Text style={styles.addressText}>{billingAddress}</Text>
                             </View>
                         </View>
@@ -357,7 +350,6 @@ export default ({
                                 <Text style={styles.commercialHeaderText}>Destination Address</Text>
                             </View>
                             <View style={styles.commercialContent}>
-                                <Text style={styles.addressText}>M/S {companyName}</Text>
                                 <Text style={styles.addressText}>{destinationAddress}</Text>
                             </View>
                         </View>
@@ -438,11 +430,9 @@ export default ({
                     <View style={styles.signatureContainer}>
                         <View style={styles.signatureSection}>
                             <Text style={styles.signatureLabel}>Prepared By</Text>
-                            {/* <Text>{preparedBy}</Text> */}
                         </View>
                         <View style={styles.signatureSection}>
                             <Text style={styles.signatureLabel}>Approved By</Text>
-                            {/* <Text>{approvedBy}</Text> */}
                         </View>
                         <Text style={styles.companySignature}>For {companyName}</Text>
                     </View>

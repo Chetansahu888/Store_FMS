@@ -405,13 +405,13 @@ useEffect(() => {
         });
 
         const pdfProps: POPdfProps = {
-            // companyLogo: logoBase64,
-            companyName: details?.companyName || '',
-            companyPhone: details?.companyPhone || '',
-            companyGstin: details?.companyGstin || '',
-            companyPan: details?.companyPan || '',
-            companyAddress: details?.companyAddress || '',
-            billingAddress: details?.billingAddress || '',
+    // companyLogo: logoBase64,
+    companyName: firmCompanyName || details?.companyName || '',
+    companyPhone: details?.companyPhone || '',
+    companyGstin: details?.companyGstin || '',
+    companyPan: details?.companyPan || '',
+    companyAddress: firmCompanyAddress || details?.companyAddress || '',
+    billingAddress: firmCompanyAddress || details?.billingAddress || '',
             destinationAddress: destinationAddress, // Use the editable destination address
             supplierName: values.supplierName,
             supplierAddress: values.supplierAddress,
