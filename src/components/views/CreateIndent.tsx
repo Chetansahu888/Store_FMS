@@ -144,7 +144,7 @@ export default () => {
 
                 if (product.attachment !== undefined) {
                     row.attachment = await uploadFile(
-                        product.attachment,
+                        // product.attachment,
                         import.meta.env.VITE_IDENT_ATTACHMENT_FOLDER
                     );
                 }

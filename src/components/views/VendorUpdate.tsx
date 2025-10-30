@@ -568,7 +568,7 @@ export default () => {
 
             if (values.comparisonSheet) {
                 url = await uploadFile(
-                    values.comparisonSheet,
+                    // values.comparisonSheet,
                     import.meta.env.VITE_COMPARISON_SHEET_FOLDER
                 );
             }

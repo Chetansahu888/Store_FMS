@@ -510,14 +510,14 @@ export default () => {
 
             if (values.photoOfProduct) {
                 photoOfProductUrl = await uploadFile(
-                    values.photoOfProduct,
+                    // values.photoOfProduct,
                     import.meta.env.VITE_PRODUCT_PHOTO_FOLDER
                 );
             }
 
             if (values.photoOfBill) {
                 photoOfBillUrl = await uploadFile(
-                    values.photoOfBill,
+                    // values.photoOfBill,
                     import.meta.env.VITE_BILL_PHOTO_FOLDER
                 );
             }

@@ -435,7 +435,7 @@ useEffect(() => {
             let photoUrl = '';
             if (values.photoOfBill) {
                 photoUrl = await uploadFile(
-                    values.photoOfBill,
+                    // values.photoOfBill,
                     import.meta.env.VITE_BILL_PHOTO_FOLDER || 'bill-photos'
                 );
             }

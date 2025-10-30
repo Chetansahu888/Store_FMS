@@ -390,7 +390,7 @@ useEffect(() => {
 
             if (values.debitNoteCopy) {
                 debitNoteCopyUrl = await uploadFile(
-                    values.debitNoteCopy,
+                    // values.debitNoteCopy,
                     import.meta.env.VITE_COMPARISON_SHEET_FOLDER
                 );
             }
@@ -399,7 +399,7 @@ useEffect(() => {
 
             if (values.billCopy) {
                 billCopyUrl = await uploadFile(
-                    values.billCopy,
+                    // values.billCopy,
                     import.meta.env.VITE_COMPARISON_SHEET_FOLDER
                 );
             }
@@ -407,7 +407,7 @@ useEffect(() => {
 
             if (values.returnCopy) {
                 returnCopyUrl = await uploadFile(
-                    values.returnCopy,
+                    // values.returnCopy,
                     import.meta.env.VITE_COMPARISON_SHEET_FOLDER
                 );
             }

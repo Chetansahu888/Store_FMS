@@ -178,7 +178,7 @@ export default function FullKitting() {
             let biltyImageUrl = '';
             if (values.biltyImage) {
                 biltyImageUrl = await uploadFile(
-                    values.biltyImage,
+                    // values.biltyImage,
                     import.meta.env.VITE_COMPARISON_SHEET_FOLDER
                 );
             }

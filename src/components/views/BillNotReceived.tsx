@@ -289,7 +289,7 @@ export default () => {
         // Upload image if provided
         if (values.billImageStatus) {
             const uploadedUrl = await uploadFile(
-                values.billImageStatus,
+                // values.billImageStatus
                 import.meta.env.VITE_BILL_PHOTO_FOLDER
             );
             billImageUrl = uploadedUrl;
