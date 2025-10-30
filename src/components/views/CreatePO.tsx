@@ -378,195 +378,206 @@ useEffect(() => {
     };
 
     async function onSubmit(values: FormData) {
-        try {
-            const poNumber =
-                mode === 'create'
-                    ? values.poNumber
-                    : incrementPoRevision(values.poNumber, poMasterSheet);
-            const grandTotal = calculateGrandTotal(
+    try {
+        const poNumber =
+            mode === 'create'
+                ? values.poNumber
+                : incrementPoRevision(values.poNumber, poMasterSheet);
+        const grandTotal = calculateGrandTotal(
+            values.indents.map((indent) => {
+                const value = indentSheet.find((i) => i.indentNumber === indent.indentNumber);
+                return {
+                    quantity: indent.quantity || value?.approvedQuantity || 0, // Use form values
+                    rate: indent.rate || value?.approvedRate || 0,
+                    discountPercent: indent?.discount || 0,
+                    gstPercent: indent.gst,
+                };
+            })
+        );
+
+        // Convert logo image to base64 for PDF
+        const logoResponse = await fetch('/logo.png');
+        const logoBlob = await logoResponse.blob();
+        const logoBase64 = await new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.readAsDataURL(logoBlob);
+        });
+
+        const pdfProps: POPdfProps = {
+            // companyLogo: logoBase64,
+            companyName: details?.companyName || '',
+            companyPhone: details?.companyPhone || '',
+            companyGstin: details?.companyGstin || '',
+            companyPan: details?.companyPan || '',
+            companyAddress: details?.companyAddress || '',
+            billingAddress: details?.billingAddress || '',
+            destinationAddress: destinationAddress, // Use the editable destination address
+            supplierName: values.supplierName,
+            supplierAddress: values.supplierAddress,
+            supplierGstin: values.gstin,
+            orderNumber: poNumber,
+            orderDate: formatDate(values.poDate),
+            quotationNumber: values.quotationNumber,
+            quotationDate: formatDate(values.quotationDate),
+            enqNo: values.ourEnqNo,
+            enqDate: formatDate(values.enquiryDate),
+            description: values.description,
+            items: values.indents.map((item) => {
+                const indent = indentSheet.find((i) => i.indentNumber === item.indentNumber)!;
+                return {
+                    internalCode: indent.indentNumber,
+                    product: indent.productName,
+                    description: indent.specifications,
+                    quantity: item.quantity || 0, // Use editable quantity
+                    unit: item.unit || '', // Use editable unit
+                    rate: item.rate || 0, // Use editable rate
+
+                    gst: item.gst || 0,
+                    discount: item.discount || 0,
+                    amount: calculateTotal(
+                        item.rate || 0,
+                        item.gst || 0,
+                        item.discount || 0,
+                        item.quantity || 0
+                    ),
+                };
+            }),
+            total: calculateSubtotal(
                 values.indents.map((indent) => {
-                    const value = indentSheet.find((i) => i.indentNumber === indent.indentNumber);
+                    const value = indentSheet.find(
+                        (i) => i.indentNumber === indent.indentNumber
+                    );
                     return {
-                        quantity: indent.quantity || value?.approvedQuantity || 0, // Use form values
-                        rate: indent.rate || value?.approvedRate || 0,
+                        quantity: indent.quantity || 0, // Use editable quantity
+                        rate: indent.rate || 0, // Use editable rate
+                        discountPercent: indent?.discount || 0,
+                    };
+                })
+            ),
+            gstAmount: calculateTotalGst(
+                values.indents.map((indent) => {
+                    const value = indentSheet.find(
+                        (i) => i.indentNumber === indent.indentNumber
+                    );
+                    return {
+                        quantity: indent.quantity || 0, // Use editable quantity
+                        rate: indent.rate || 0, // Use editable rate
                         discountPercent: indent?.discount || 0,
                         gstPercent: indent.gst,
                     };
                 })
-            );
+            ),
+            grandTotal: grandTotal,
+            terms: values.terms,
+            // preparedBy: values.preparedBy,
+            // approvedBy: values.approvedBy,
+        };
 
-            // Convert logo image to base64 for PDF
-            const logoResponse = await fetch('/logo.png');
-            const logoBlob = await logoResponse.blob();
-            const logoBase64 = await new Promise<string>((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result as string);
-                reader.readAsDataURL(logoBlob);
-            });
+        const blob = await pdf(<POPdf {...pdfProps} />).toBlob();
+        const file = new File([blob], `PO-${poNumber}.pdf`, {
+            type: 'application/pdf',
+        });
 
-            const pdfProps: POPdfProps = {
-                // companyLogo: logoBase64,
-                companyName: details?.companyName || '',
-                companyPhone: details?.companyPhone || '',
-                companyGstin: details?.companyGstin || '',
-                companyPan: details?.companyPan || '',
-                companyAddress: details?.companyAddress || '',
-                billingAddress: details?.billingAddress || '',
-                destinationAddress: destinationAddress, // Use the editable destination address
-                supplierName: values.supplierName,
-                supplierAddress: values.supplierAddress,
-                supplierGstin: values.gstin,
-                orderNumber: poNumber,
-                orderDate: formatDate(values.poDate),
-                quotationNumber: values.quotationNumber,
-                quotationDate: formatDate(values.quotationDate),
-                enqNo: values.ourEnqNo,
-                enqDate: formatDate(values.enquiryDate),
-                description: values.description,
-                items: values.indents.map((item) => {
-                    const indent = indentSheet.find((i) => i.indentNumber === item.indentNumber)!;
-                    return {
-                        internalCode: indent.indentNumber,
-                        product: indent.productName,
-                        description: indent.specifications,
-                        quantity: item.quantity || 0, // Use editable quantity
-                        unit: item.unit || '', // Use editable unit
-                        rate: item.rate || 0, // Use editable rate
+        const email = details?.vendors.find((v) => v.vendorName === values.supplierName)?.email;
 
-                        gst: item.gst || 0,
-                        discount: item.discount || 0,
-                        amount: calculateTotal(
-                            item.rate || 0,
-                            item.gst || 0,
-                            item.discount || 0,
-                            item.quantity || 0
-                        ),
-                    };
-                }),
-                total: calculateSubtotal(
-                    values.indents.map((indent) => {
-                        const value = indentSheet.find(
-                            (i) => i.indentNumber === indent.indentNumber
-                        );
-                        return {
-                            quantity: indent.quantity || 0, // Use editable quantity
-                            rate: indent.rate || 0, // Use editable rate
-                            discountPercent: indent?.discount || 0,
-                        };
-                    })
-                ),
-                gstAmount: calculateTotalGst(
-                    values.indents.map((indent) => {
-                        const value = indentSheet.find(
-                            (i) => i.indentNumber === indent.indentNumber
-                        );
-                        return {
-                            quantity: indent.quantity || 0, // Use editable quantity
-                            rate: indent.rate || 0, // Use editable rate
-                            discountPercent: indent?.discount || 0,
-                            gstPercent: indent.gst,
-                        };
-                    })
-                ),
-                grandTotal: grandTotal,
-                terms: values.terms,
-                // preparedBy: values.preparedBy,
-                // approvedBy: values.approvedBy,
+// Create upload parameters - always upload, email only if available
+const uploadParams: {
+    file: File;
+    folderId: string;
+    uploadType?: 'upload' | 'email';
+    email?: string;
+    emailSubject?: string;
+    emailBody?: string;
+} = {
+    file,
+    folderId: import.meta.env.VITE_PURCHASE_ORDERS_FOLDER,
+    uploadType: 'upload', // Default to regular upload
+};
+
+// Only change to email upload if valid email exists
+if (email && email.trim() && email.includes('@')) {
+    uploadParams.uploadType = 'email';
+    uploadParams.email = email;
+    uploadParams.emailSubject = `Purchase Order - ${poNumber}`;
+    uploadParams.emailBody = `Please find attached Purchase Order ${poNumber}`;
+}
+
+const url = await uploadFile(uploadParams);
+
+        const rows: PoMasterSheet[] = values.indents.map((v) => {
+            const indent = indentSheet.find((i) => i.indentNumber === v.indentNumber)!;
+
+            const formatDateTime = (date: Date) => {
+                const pad = (n: number) => n.toString().padStart(2, '0');
+                return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date
+                    .getFullYear()
+                    .toString()
+                    .slice(-2)} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
+                        date.getSeconds()
+                    )}`;
             };
 
-            const blob = await pdf(<POPdf {...pdfProps} />).toBlob();
-            const file = new File([blob], `PO-${poNumber}.pdf`, {
-                type: 'application/pdf',
-            });
-            const email = details?.vendors.find((v) => v.vendorName === values.supplierName)?.email;
+            return {
+                timestamp: values.poDate.toISOString(),
+                partyName: values.supplierName,
+                poNumber,
+                internalCode: v.indentNumber,
+                product: indent.productName,
+                description: values.description,
+                // ✅ Use edited values from form instead of original values
+                quantity: v.quantity || indent.approvedQuantity,     // Use form value first
+                unit: v.unit || indent.uom,                          // Use form value first
+                rate: v.rate || indent.approvedRate,                 // Use form value first
+                gst: v.gst,
+                discount: v.discount || 0,
+                amount: calculateTotal(
+                    v.rate || indent.approvedRate,           // ✅ Use form value for calculation
+                    v.gst,
+                    v.discount || 0,
+                    v.quantity || indent.approvedQuantity    // ✅ Use form value for calculation
+                ),
+                totalPoAmount: grandTotal,
+                pdf: url,
+                // preparedBy: values.preparedBy,
+                // approvedBy: values.approvedBy,
+                quotationNumber: values.quotationNumber,
+                quotationDate: formatDateTime(values.quotationDate),
+                enquiryNumber: values.ourEnqNo,
+                enquiryDate: formatDateTime(values.enquiryDate),
+                term1: values.terms[0],
+                term2: values.terms[1],
+                term3: values.terms[2],
+                term4: values.terms[3],
+                term5: values.terms[4],
+                term6: values.terms[5],
+                term7: values.terms[6],
+                term8: values.terms[7],
+                term9: values.terms[8],
+                term10: values.terms[9],
+                discountPercent: v.discount || 0,
+                gstPercent: v.gst,
+                deliveryDate: formatDateTime(values.deliveryDate),
+                paymentTerms: values.paymentTerms,
+                numberOfDays: values.numberOfDays || 0,
+                deliveryDays: values.deliveryDays || 0, // ADD THIS (Column AH)
+                deliveryType: values.deliveryType || '', // ADD THIS (Column AI)
+                firmNameMatch: indent.firmNameMatch ?? '',
+            };
+        });
 
-            if (!email) {
-                toast.error("Supplier's Email was not found!");
-                return;
-            }
-            const url = await uploadFile(
-                file,
-                import.meta.env.VITE_PURCHASE_ORDERS_FOLDER,
-                'email',
-                email
-            );
-
-
-
-            const rows: PoMasterSheet[] = values.indents.map((v) => {
-                const indent = indentSheet.find((i) => i.indentNumber === v.indentNumber)!;
-
-                const formatDateTime = (date: Date) => {
-                    const pad = (n: number) => n.toString().padStart(2, '0');
-                    return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date
-                        .getFullYear()
-                        .toString()
-                        .slice(-2)} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
-                            date.getSeconds()
-                        )}`;
-                };
-
-                return {
-                    timestamp: values.poDate.toISOString(),
-                    partyName: values.supplierName,
-                    poNumber,
-                    internalCode: v.indentNumber,
-                    product: indent.productName,
-                    description: values.description,
-                    // ✅ Use edited values from form instead of original values
-                    quantity: v.quantity || indent.approvedQuantity,     // Use form value first
-                    unit: v.unit || indent.uom,                          // Use form value first
-                    rate: v.rate || indent.approvedRate,                 // Use form value first
-                    gst: v.gst,
-                    discount: v.discount || 0,
-                    amount: calculateTotal(
-                        v.rate || indent.approvedRate,           // ✅ Use form value for calculation
-                        v.gst,
-                        v.discount || 0,
-                        v.quantity || indent.approvedQuantity    // ✅ Use form value for calculation
-                    ),
-                    totalPoAmount: grandTotal,
-                    pdf: url,
-                    // preparedBy: values.preparedBy,
-                    // approvedBy: values.approvedBy,
-                    quotationNumber: values.quotationNumber,
-                    quotationDate: formatDateTime(values.quotationDate),
-                    enquiryNumber: values.ourEnqNo,
-                    enquiryDate: formatDateTime(values.enquiryDate),
-                    term1: values.terms[0],
-                    term2: values.terms[1],
-                    term3: values.terms[2],
-                    term4: values.terms[3],
-                    term5: values.terms[4],
-                    term6: values.terms[5],
-                    term7: values.terms[6],
-                    term8: values.terms[7],
-                    term9: values.terms[8],
-                    term10: values.terms[9],
-                    discountPercent: v.discount || 0,
-                    gstPercent: v.gst,
-                    deliveryDate: formatDateTime(values.deliveryDate),
-                    paymentTerms: values.paymentTerms,
-                    numberOfDays: values.numberOfDays || 0,
-                    deliveryDays: values.deliveryDays || 0, // ADD THIS (Column AH)
-                    deliveryType: values.deliveryType || '', // ADD THIS (Column AI)
-                    firmNameMatch: indent.firmNameMatch ?? '',
-                };
-            });
-
-            await postToSheet(rows, 'insert', 'PO MASTER');
-            toast.success(`Successfully ${mode}d purchase order`);
-            form.reset();
-            setTimeout(() => {
-                updatePoMasterSheet();
-                updateIndentSheet();
-            }, 1000);
-        } catch (e) {
-            console.log(e);
-            toast.error(`Failed to ${mode} purchase order`);
-        }
+        await postToSheet(rows, 'insert', 'PO MASTER');
+        toast.success(`Successfully ${mode}d purchase order`);
+        form.reset();
+        setTimeout(() => {
+            updatePoMasterSheet();
+            updateIndentSheet();
+        }, 1000);
+    } catch (e) {
+        console.log(e);
+        toast.error(`Failed to ${mode} purchase order`);
     }
-
+}
     function onError(e: any) {
         console.log(e);
         toast.error('Please fill all required fields');
@@ -1038,23 +1049,23 @@ useEffect(() => {
                             <hr />
 
 <div className="grid md:grid-cols-3 gap-3">
-    <Card className="p-0 gap-0 shadow-xs rounded-[3px]">
-        <CardHeader className="bg-muted px-5 py-2">
-            <CardTitle className="text-center">
-                Our Commercial Details
-            </CardTitle>
-        </CardHeader>
-        <CardContent className="p-5 text-sm">
-            <p>
-                <span className="font-medium">GSTIN</span>{' '}
-                {details?.companyGstin}
-            </p>
-            <p>
-                <span className="font-medium">Pan No.</span>{' '}
-                {details?.companyPan}
-            </p>
-        </CardContent>
-    </Card>
+   <Card className="p-0 gap-0 shadow-xs rounded-[3px]">
+    <CardHeader className="bg-muted px-5 py-2">
+        <CardTitle className="text-center">
+            Our Commercial Details
+        </CardTitle>
+    </CardHeader>
+    <CardContent className="p-5 text-sm">
+        <p>
+            <span className="font-medium">GSTIN</span>{' '}
+            {details?.companyGstin}
+        </p>
+        <p>
+            <span className="font-medium">Pan No.</span>{' '}
+            {details?.companyPan}
+        </p>
+    </CardContent>
+</Card>
     
     <Card className="p-0 gap-0 shadow-xs rounded-[3px]">
         <CardHeader className="bg-muted px-5 py-2">

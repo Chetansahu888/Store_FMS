@@ -1,11 +1,25 @@
 import type { IndentSheet, MasterSheet, ReceivedSheet, Sheet, StoreInSheet } from '@/types';
 import type { InventorySheet, IssueSheet, PoMasterSheet, TallyEntrySheet, UserPermissions, Vendor, PcReportSheet } from '@/types/sheets';
 
-export async function uploadFile(file: File, folderId: string, uploadType: 'upload' | 'email' = 'upload', email?: string): Promise<string> {
+export async function uploadFile({
+    file,
+    folderId,
+    uploadType = 'upload',
+    email,
+    emailSubject,
+    emailBody
+}: {
+    file: File;
+    folderId: string;
+    uploadType?: 'upload' | 'email';
+    email?: string;
+    emailSubject?: string;
+    emailBody?: string;
+}): Promise<string> {
     const base64: string = await new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => {
-            const base64String = (reader.result as string)?.split(',')[1]; // Remove data:type;base64, prefix
+            const base64String = (reader.result as string)?.split(',')[1];
             resolve(base64String);
         };
         reader.onerror = reject;
@@ -19,10 +33,12 @@ export async function uploadFile(file: File, folderId: string, uploadType: 'uplo
     form.append('fileData', base64);
     form.append('folderId', folderId);
     form.append('uploadType', uploadType);
-    if (uploadType === "email") {
-        form.append('email', email!);
-        form.append('emailSubject', "Purchase Order");
-        form.append('emailBody', "Please find attached PO.");
+    
+    // Only add email fields if uploadType is 'email' AND email exists
+    if (uploadType === "email" && email) {
+        form.append('email', email);
+        form.append('emailSubject', emailSubject || 'Purchase Order');
+        form.append('emailBody', emailBody || 'Please find attached PO.');
     }
 
     const response = await fetch(import.meta.env.VITE_APP_SCRIPT_URL, {
@@ -39,7 +55,6 @@ export async function uploadFile(file: File, folderId: string, uploadType: 'uplo
 
     return res.fileUrl as string;
 }
-
 export async function fetchSheet(
     sheetName: Sheet
 ): Promise<MasterSheet | IndentSheet[] | ReceivedSheet[] | UserPermissions[] | PoMasterSheet[] | InventorySheet[] | StoreInSheet[] | IssueSheet[] | TallyEntrySheet[] | PcReportSheet[]> {
