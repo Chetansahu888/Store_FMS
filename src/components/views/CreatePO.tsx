@@ -37,20 +37,30 @@ function generatePoNumber(poNumbers: string[], today = new Date()): string {
     .padStart(2, '0')}`;
   const prefix = `STORE-PO-${fy}-`;
 
-  // Step 2: Extract and count existing numbers for current financial year
-  const numbersInFY = poNumbers
-    .filter(po => po.includes(fy))
+  // Step 2: Extract existing numbers for current financial year and sort them
+  const existingNumbers = poNumbers
+    .filter(po => po.startsWith(prefix)) // Only exact prefix match
     .map(po => {
-      const match = po.match(/-(\d+)$/);
-      return match ? parseInt(match[1], 10) : null;
+      const numberStr = po.replace(prefix, '');
+      const num = parseInt(numberStr, 10);
+      return isNaN(num) ? 0 : num;
     })
-    .filter(n => n !== null && n !== undefined);
+    .filter(n => n > 0) // Filter out invalid numbers
+    .sort((a, b) => a - b); // Sort in ascending order
 
-  // Step 3: Use count + 1 for true sequential numbering
-  const next = numbersInFY.length + 1;
-  return `${prefix}${next}`;
+  // Step 3: Find the first gap or next available number
+  let nextNumber = 1;
+  
+  for (let i = 0; i < existingNumbers.length; i++) {
+    if (existingNumbers[i] !== nextNumber) {
+      // Found a gap, use this number
+      break;
+    }
+    nextNumber++;
+  }
+  
+  return `${prefix}${nextNumber}`;
 }
-
 
 
 function incrementPoRevision(poNumber: string, allPOs: PoMasterSheet[]): string {
