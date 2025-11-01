@@ -29,38 +29,26 @@ import { pdf } from '@react-pdf/renderer';
 import POPdf, { type POPdfProps } from '../element/POPdf';
 import POMaster from './POMaster';
 
-function generatePoNumber(poNumbers: string[], today = new Date()): string {
-  // Step 1: Get financial year from today's date
-  const fyStart = today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
-  const fy = `${(fyStart % 100).toString().padStart(2, '0')}-${((fyStart + 1) % 100)
-    .toString()
-    .padStart(2, '0')}`;
-  const prefix = `STORE-PO-${fy}-`;
-
-  // Step 2: Extract existing numbers for current financial year and sort them
+function generatePoNumber(poNumbers: string[]): string {
+  const prefix = 'STORE-PO-25-26-';
+  
+  // Extract all numbers for this prefix
   const existingNumbers = poNumbers
-    .filter(po => po.startsWith(prefix)) // Only exact prefix match
+    .filter(po => po.startsWith(prefix))
     .map(po => {
       const numberStr = po.replace(prefix, '');
       const num = parseInt(numberStr, 10);
       return isNaN(num) ? 0 : num;
     })
-    .filter(n => n > 0) // Filter out invalid numbers
-    .sort((a, b) => a - b); // Sort in ascending order
+    .filter(n => n > 0);
 
-  // Step 3: Find the first gap or next available number
-  let nextNumber = 1;
-  
-  for (let i = 0; i < existingNumbers.length; i++) {
-    if (existingNumbers[i] !== nextNumber) {
-      // Found a gap, use this number
-      break;
-    }
-    nextNumber++;
-  }
-  
+  // Find highest number and add 1
+  const maxNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) : 0;
+  const nextNumber = maxNumber + 1;
+
   return `${prefix}${nextNumber}`;
 }
+
 
 
 function incrementPoRevision(poNumber: string, allPOs: PoMasterSheet[]): string {
@@ -215,7 +203,7 @@ export default () => {
                 'poNumber',
                 generatePoNumber(
                     poMasterSheet.map((p) => p.poNumber),
-                    poDate
+                    // poDate
                 )
             );
         }

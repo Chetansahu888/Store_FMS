@@ -291,7 +291,7 @@ export default ({
                         </View>
                         <View style={styles.detailsSection}>
                             <View style={styles.detailRow}>
-                                <Text style={styles.detailLabel}>Order No:</Text>
+                                <Text style={styles.detailLabel}>PO Number::</Text>
                                 <Text style={styles.detailValue}>{orderNumber}</Text>
                             </View>
                             <View style={styles.detailRow}>
