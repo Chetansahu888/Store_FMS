@@ -69,6 +69,7 @@ interface IndentSheetRecord {
     deliveryDate?: string | number | Date;
     productName?: string;
     pendingLiftQty?: string | number;
+    pendingQty?: string | number; // ADD THIS LINE
     quantity?: string | number;
     approvedQuantity?: string | number;
     cancelOty?: string | number; // ✅ ADD THIS - matches the header field name
@@ -137,7 +138,7 @@ export default function GetPurchase() {
                         .reduce((sum: number, store: StoreInRecord) => sum + (Number(store.receivedQuantity) || 0), 0);
                     
                     const approvedQty = Number(sheet.approvedQuantity) || Number(sheet.quantity) || 0;
-                    const pendingLift = Number(sheet.pendingLiftQty) || approvedQty;
+                    const pendingQty = Number(sheet.pendingQty) || approvedQty;
                     
                     return {
                         indentNo: sheet.indentNumber?.toString() || '',
@@ -149,9 +150,9 @@ export default function GetPurchase() {
                         plannedDate: sheet.planned5 ? formatDate(new Date(sheet.planned5)) : 'Not Set', // ✅ ADD THIS
                         product: sheet.productName || '',
                         quantity: approvedQty,
-                        pendingLiftQty: pendingLift,
+                        pendingLiftQty: pendingQty, // Now using pendingQty
                         receivedQty: receivedQty,
-                        pendingPoQty: pendingLift - receivedQty,
+                        pendingPoQty: pendingQty - receivedQty,
                     };
                 })
         );
@@ -918,22 +919,22 @@ if (values.cancelPendingQty && values.cancelPendingQty > 0) {
 
                                     {billStatus && (
                                         <>
-                                            <FormField
-                                                control={form.control}
-                                                name="qty"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Qty</FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                type="number"
-                                                                placeholder="Enter quantity"
-                                                                {...field}
-                                                            />
-                                                        </FormControl>
-                                                    </FormItem>
-                                                )}
-                                            />
+                                            {/* Replace the Qty field */}
+                                                <FormField
+                                                    control={form.control}
+                                                    name="qty"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Qty</FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    placeholder="Enter quantity"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
 
                                             <FormField
                                                 control={form.control}
@@ -1095,22 +1096,21 @@ if (values.cancelPendingQty && values.cancelPendingQty > 0) {
                                             />
 
                                             <FormField
-                                                control={form.control}
-                                                name="amount"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Amount</FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                type="number"
-                                                                placeholder="Enter amount"
-                                                                {...field}
-                                                                disabled={form.watch("transportationInclude") !== "Yes"}
-                                                            />
-                                                        </FormControl>
-                                                    </FormItem>
-                                                )}
-                                            />
+                                                            control={form.control}
+                                                            name="amount"
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormLabel>Amount</FormLabel>
+                                                                    <FormControl>
+                                                                        <Input
+                                                                            placeholder="Enter amount"
+                                                                            {...field}
+                                                                            disabled={form.watch("transportationInclude") !== "Yes"}
+                                                                        />
+                                                                    </FormControl>
+                                                                </FormItem>
+                                                            )}
+                                                        />
 
                                             <FormField
                                                 control={form.control}
@@ -1159,40 +1159,36 @@ if (values.cancelPendingQty && values.cancelPendingQty > 0) {
                                             {typeOfBill === 'independent' && (
                                                 <>
                                                     <FormField
-                                                        control={form.control}
-                                                        name="billAmount"
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormLabel>Bill Amount *</FormLabel>
-                                                                <FormControl>
-                                                                    <Input
-                                                                        type="number"
-                                                                        placeholder="Enter bill amount"
-                                                                        {...field}
-                                                                    />
-                                                                </FormControl>
-                                                            </FormItem>
-                                                        )}
-                                                    />
+                                                            control={form.control}
+                                                            name="billAmount"
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormLabel>Bill Amount</FormLabel>
+                                                                    <FormControl>
+                                                                        <Input
+                                                                            placeholder="Enter bill amount"
+                                                                            {...field}
+                                                                        />
+                                                                    </FormControl>
+                                                                </FormItem>
+                                                            )}
+                                                        />
 
                                                     <FormField
-                                                        control={form.control}
-                                                        name="discountAmount"
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormLabel>
-                                                                    Discount Amount
-                                                                </FormLabel>
-                                                                <FormControl>
-                                                                    <Input
-                                                                        type="number"
-                                                                        placeholder="Enter discount amount"
-                                                                        {...field}
-                                                                    />
-                                                                </FormControl>
-                                                            </FormItem>
-                                                        )}
-                                                    />
+                                                    control={form.control}
+                                                    name="discountAmount"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>Discount Amount</FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    placeholder="Enter discount amount"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
 
                                                     <FormField
                                                         control={form.control}
@@ -1222,49 +1218,45 @@ if (values.cancelPendingQty && values.cancelPendingQty > 0) {
                                                         )}
                                                     />
 
-                                                    <FormField
-                                                        control={form.control}
-                                                        name="advanceAmount"
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormLabel>
-                                                                    Advance Amount If Any
-                                                                </FormLabel>
-                                                                <FormControl>
-                                                                    <Input
-                                                                        type="number"
-                                                                        placeholder="Enter advance amount"
-                                                                        {...field}
-                                                                    />
-                                                                </FormControl>
-                                                            </FormItem>
+                                                   <FormField
+                                                control={form.control}
+                                                name="advanceAmount"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Advance Amount If Any</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                placeholder="Enter advance amount"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="photoOfBill"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>Photo/Bill Document *</FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="file"
+                                                                accept="image/*,.pdf,application/pdf"
+                                                                onChange={(e) => field.onChange(e.target.files?.[0])}
+                                                            />
+                                                        </FormControl>
+                                                        {form.formState.errors.photoOfBill && (
+                                                            <p className="text-sm text-red-500">
+                                                                {form.formState.errors.photoOfBill.message}
+                                                            </p>
                                                         )}
-                                                    />
-
-<FormField
-    control={form.control}
-    name="photoOfBill"
-    render={({ field }) => (
-        <FormItem>
-            <FormLabel>Photo/Bill Document *</FormLabel>
-            <FormControl>
-                <Input
-                    type="file"
-                    accept="image/*,.pdf,application/pdf"
-                    onChange={(e) => field.onChange(e.target.files?.[0])}
-                />
-            </FormControl>
-            {form.formState.errors.photoOfBill && (
-                <p className="text-sm text-red-500">
-                    {form.formState.errors.photoOfBill.message}
-                </p>
-            )}
-            <p className="text-xs text-muted-foreground">
-                Upload image (JPEG, PNG, GIF, WebP) or PDF document
-            </p>
-        </FormItem>
-    )}
-/>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            Upload image (JPEG, PNG, GIF, WebP) or PDF document
+                                                        </p>
+                                                    </FormItem>
+                                                )}
+                                            />
                                                 </>
                                             )}
                                         </>

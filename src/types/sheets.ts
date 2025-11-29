@@ -81,7 +81,9 @@ export type IndentSheet = {
     issueStatus: string;
     liftingStatus: string;
     // pendingLiftQty: number;
-    pendingLiftQty: number
+    pendingLiftQty: number;
+    pendingQty: number;     // ✅ ADD THIS LINE
+
     firmNameMatch: string;
     // advanceIfAny: string;
     paymentype: string;
