@@ -24,7 +24,7 @@ import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { postToSheet, uploadFile } from '@/lib/fetchers';
 import type { ReceivedSheet } from '@/types';
-import { Truck } from 'lucide-react';
+import { Truck ,Search} from 'lucide-react';
 import { Tabs, TabsContent } from '../ui/tabs';
 import { useAuth } from '@/context/AuthContext';
 import Heading from '../element/Heading';
@@ -176,14 +176,14 @@ const formatPlannedDate = (dateString: string) => {
 };
 
 export default () => {
-    const { storeInSheet, indentSheet, updateAll } = useSheets();
+    const { storeInSheet, indentSheet, updateAll, masterSheet: options } = useSheets(); // ✅ Get masterSheet from context
     const { user } = useAuth();
 
     const [tableData, setTableData] = useState<StoreInPendingData[]>([]);
     const [historyData, setHistoryData] = useState<StoreInHistoryData[]>([]);
     const [selectedIndent, setSelectedIndent] = useState<StoreInPendingData | null>(null);
     const [openDialog, setOpenDialog] = useState(false);
-
+    const [searchTermLocation, setSearchTermLocation] = useState(''); // ✅ Add search state for location
     const [indentLoading, setIndentLoading] = useState(false);
     const [receivedLoading, setReceivedLoading] = useState(false);
 
@@ -422,6 +422,9 @@ export default () => {
         damageOrder: z.enum(['Yes', 'No']),
         quantityAsPerBill: z.enum(['Yes', 'No']),
         remark: z.string().optional(),
+        location: z.string().nonempty('Location is required'), // ✅ Add location field
+
+
     });
 
     type FormValues = z.infer<typeof schema>;
@@ -435,6 +438,8 @@ export default () => {
             damageOrder: undefined,
             quantityAsPerBill: undefined,
             remark: '',
+            location: '', // ✅ Location in default values
+
         },
     });
 
@@ -449,6 +454,7 @@ export default () => {
                 damageOrder: undefined,
                 quantityAsPerBill: undefined,
                 remark: '',
+                location: '', // ✅ Reset location field
             });
         }
     }, [openDialog, form]);
@@ -489,6 +495,8 @@ export default () => {
                     damageOrder: values.damageOrder,
                     quantityAsPerBill: values.quantityAsPerBill,
                     remark: values.remark,
+                    location: values.location, // ✅ Add location to submission
+
                 })),
                 'update',
                 'STORE IN'
@@ -692,6 +700,61 @@ export default () => {
                                             </FormItem>
                                         )}
                                     />
+
+                                     {/* ✅ ADD DYNAMIC LOCATION DROPDOWN FROM MASTER SHEET */}
+    <FormField
+        control={form.control}
+        name="location"
+        render={({ field }) => (
+            <FormItem>
+                <FormLabel>
+                    Location
+                    <span className="text-destructive">*</span>
+                </FormLabel>
+                <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                >
+                    <FormControl>
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select location" />
+                        </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                        {/* 🔍 Search Box for Locations */}
+                        <div className="flex items-center border-b px-3 pb-3">
+                            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                            <input
+                                placeholder="Search locations..."
+                                value={searchTermLocation}
+                                onChange={(e) => setSearchTermLocation(e.target.value)}
+                                onKeyDown={(e) => e.stopPropagation()}
+                                className="flex h-10 w-full rounded-md border-0 bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground"
+                            />
+                        </div>
+                        {/* ✅ Dynamic locations from Master sheet */}
+                        {(options?.locations || [])
+                            .filter((location) =>
+                                location.toLowerCase().includes(searchTermLocation.toLowerCase())
+                            )
+                            .map((location, i) => (
+                                <SelectItem key={i} value={location}>
+                                    {location}
+                                </SelectItem>
+                            ))}
+                        {/* Fallback if no locations */}
+                        {(options?.locations || []).length === 0 && (
+                            <SelectItem value="no-locations" disabled>
+                                No locations available
+                            </SelectItem>
+                        )}
+                    </SelectContent>
+                </Select>
+            </FormItem>
+        )}
+    />
+
+
                                     <FormField
                                         control={form.control}
                                         name="remark"

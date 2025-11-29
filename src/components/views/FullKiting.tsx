@@ -29,6 +29,14 @@ import { postToSheet, uploadFile } from '@/lib/fetchers';
 import { Truck } from 'lucide-react';
 import Heading from '../element/Heading';
 
+// Helper function to format date as "YYYY-MM-DD"
+function formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 interface FullkittingData {
     indentNumber: string;
     vendorName: string;
@@ -39,6 +47,8 @@ interface FullkittingData {
     transporterName: string;
     amount: number;
     firmNameMatch: string;
+    plannedDate: string; // ✅ ADD THIS
+
 }
 
 export default function FullKitting() {
@@ -90,6 +100,9 @@ export default function FullKitting() {
                     transporterName: item.transporterName || '',
                     amount: item.amount || 0,
                     firmNameMatch: item.firmNameMatch || '',
+                    plannedDate: item.planned ? formatDate(new Date(item.planned)) : 'Not Set', // ✅ ADD THIS
+          
+    
                 }))
         );
     }, [fullkittingSheet, user.firmNameMatch]);
@@ -125,6 +138,18 @@ useEffect(() => {
         { accessorKey: 'productName', header: 'Product Name' },
         { accessorKey: 'qty', header: 'Qty' },
         { accessorKey: 'billNo', header: 'Bill No.' },
+        { 
+        accessorKey: 'plannedDate', // ✅ ADD THIS COLUMN
+        header: 'Planned Date',
+        cell: ({ getValue }) => {
+            const plannedDate = getValue() as string;
+            return (
+                <div className={`${plannedDate === 'Not Set' ? 'text-muted-foreground italic' : ''}`}>
+                    {plannedDate}
+                </div>
+            );
+        }
+    },
         { accessorKey: 'transportingInclude', header: 'Transporting Include' },
         { accessorKey: 'transporterName', header: 'Transporter Name' },
         { accessorKey: 'amount', header: 'Amount' },

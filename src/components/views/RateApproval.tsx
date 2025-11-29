@@ -37,6 +37,8 @@ interface RateApprovalData {
     vendors: [string, string, string, string, string, string][];
     date: string;
     firmNameMatch?: string;
+    plannedDate: string; // ✅ ADD THIS
+
 }
 
 interface HistoryData {
@@ -80,6 +82,8 @@ useEffect(() => {
                 product: sheet.productName,
                 comparisonSheet: sheet.comparisonSheet || '',
                 date: formatDate(new Date(sheet.timestamp)),
+                plannedDate: sheet.planned3 ? formatDate(new Date(sheet.planned3)) : 'Not Set', // ✅ ADD THIS
+
                 vendors: [
                     [
                         sheet.vendorName1, 
@@ -169,6 +173,18 @@ useEffect(() => {
         { accessorKey: 'department', header: 'Department' },
         { accessorKey: 'product', header: 'Product' },
         { accessorKey: 'date', header: 'Date' },
+         { 
+        accessorKey: 'plannedDate', 
+        header: 'Planned Date', // ✅ ADD THIS COLUMN
+        cell: ({ getValue }) => {
+            const plannedDate = getValue() as string;
+            return (
+                <div className={`${plannedDate === 'Not Set' ? 'text-muted-foreground italic' : ''}`}>
+                    {plannedDate}
+                </div>
+            );
+        }
+    },
         {
             accessorKey: 'vendors',
             header: 'Vendors',

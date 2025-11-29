@@ -40,6 +40,7 @@ interface GetPurchaseData {
     pendingLiftQty?: number;
     receivedQty?: number;
     pendingPoQty?: number;
+    plannedDate?: string;
 }
 interface HistoryData {
     indentNo: string;
@@ -49,6 +50,7 @@ interface HistoryData {
     poDate: string;
     deliveryDate: string;
     product?: string;
+    photoOfBill?: string;
     quantity?: number;
     pendingLiftQty?: number;
     receivedQty?: number;
@@ -144,6 +146,7 @@ export default function GetPurchase() {
                         poNumber: sheet.poNumber || '',
                         poDate: sheet.actual4 ? formatDate(new Date(sheet.actual4)) : '',
                         deliveryDate: sheet.deliveryDate ? formatDate(new Date(sheet.deliveryDate)) : '',
+                        plannedDate: sheet.planned5 ? formatDate(new Date(sheet.planned5)) : 'Not Set', // ✅ ADD THIS
                         product: sheet.productName || '',
                         quantity: approvedQty,
                         pendingLiftQty: pendingLift,
@@ -232,6 +235,7 @@ export default function GetPurchase() {
                         pendingLiftQty: pendingLift,
                         receivedQty: receivedQty,
                         pendingPoQty: Math.max(0, pendingLift),
+                        photoOfBill: (sheet as any).photoOfBill || '',
                     };
                 })
                 .sort((a, b) => b.indentNo.localeCompare(a.indentNo))
@@ -296,6 +300,18 @@ export default function GetPurchase() {
             header: 'Delivery Date',
             cell: ({ getValue }) => <div>{getValue() as string || '-'}</div>
         },
+         {
+        accessorKey: 'plannedDate', // ✅ ADD THIS COLUMN
+        header: 'Planned Date',
+        cell: ({ getValue }) => {
+            const plannedDate = getValue() as string;
+            return (
+                <div className={`${plannedDate === 'Not Set' ? 'text-muted-foreground italic' : ''}`}>
+                    {plannedDate}
+                </div>
+            );
+        }
+    },
         {
             accessorKey: 'pendingLiftQty',
             header: 'Pending Lift Qty',
@@ -328,6 +344,26 @@ export default function GetPurchase() {
             accessorKey: 'vendorName',
             header: 'Approved Vendor Name',
             cell: ({ getValue }) => <div>{getValue() as string || '-'}</div>
+        },
+          {
+            accessorKey: 'photoOfBill',
+            header: 'Photo Of Bill',
+            cell: ({ getValue }) => {
+                const photoUrl = getValue() as string;
+                if (!photoUrl) return <div className="text-muted-foreground">-</div>;
+                
+                return (
+                    <div>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => window.open(photoUrl, '_blank')}
+                        >
+                            View Bill
+                        </Button>
+                    </div>
+                );
+            }
         },
         {
             accessorKey: 'poNumber',
@@ -372,7 +408,20 @@ export default function GetPurchase() {
         discountAmount: z.coerce.number().optional(),
         paymentType: z.string().optional(),
         advanceAmount: z.coerce.number().optional(),
-        photoOfBill: z.instanceof(File).optional(),
+        photoOfBill: z.instanceof(File).optional()
+        .refine((file) => {
+            // Allow both images and PDFs
+            if (!file) return true; // Optional field
+            const allowedTypes = [
+                'image/jpeg', 
+                'image/jpg', 
+                'image/png', 
+                'image/gif', 
+                'image/webp',
+                'application/pdf'
+            ];
+            return allowedTypes.includes(file.type);
+        }, 'File must be an image (JPEG, PNG, GIF, WebP) or PDF'),
         billRemark: z.string().optional(),
         vendorName: z.string().optional(),
         transportationInclude: z.string().optional(),
@@ -507,22 +556,33 @@ if (values.cancelPendingQty && values.cancelPendingQty > 0) {
 }            // Continue with original bill submission logic only if bill status is provided
          
 
-if (values.billStatus) {
+        if (values.billStatus) {
                 let photoUrl = '';
-                if (values.photoOfBill) {
-                    console.log('📤 Uploading file...');
-                    try {
-                        photoUrl = await uploadFile({
-                            file: values.photoOfBill,
-                            folderId: import.meta.env.VITE_BILL_PHOTO_FOLDER || 'bill-photos'
-                        });
-                        console.log('✅ File uploaded:', photoUrl);
-                    } catch (uploadError) {
-                        console.error('❌ File upload error:', uploadError);
-                        toast.error('Failed to upload image');
-                        return;
+                // In the onSubmit function, update the file upload section:
+                    if (values.photoOfBill) {
+                        console.log('📤 Uploading file...');
+                        console.log('📄 File type:', values.photoOfBill.type);
+                        console.log('📄 File name:', values.photoOfBill.name);
+                        
+                        try {
+                            photoUrl = await uploadFile({
+                                file: values.photoOfBill,
+                                folderId: import.meta.env.VITE_BILL_PHOTO_FOLDER || 'bill-photos'
+                            });
+                            console.log('✅ File uploaded:', photoUrl);
+                            
+                            // Show success message based on file type
+                            if (values.photoOfBill.type === 'application/pdf') {
+                                toast.success('PDF document uploaded successfully');
+                            } else {
+                                toast.success('Image uploaded successfully');
+                            }
+                        } catch (uploadError) {
+                            console.error('❌ File upload error:', uploadError);
+                            toast.error('Failed to upload file. Please try again.');
+                            return;
+                        }
                     }
-                }
 
                 const currentDateTime = new Date()
                     .toLocaleString('en-GB', {
@@ -1181,26 +1241,30 @@ if (values.billStatus) {
                                                         )}
                                                     />
 
-                                                    <FormField
-                                                        control={form.control}
-                                                        name="photoOfBill"
-                                                        render={({ field }) => (
-                                                            <FormItem>
-                                                                <FormLabel>Photo Of Bill</FormLabel>
-                                                                <FormControl>
-                                                                    <Input
-                                                                        type="file"
-                                                                        accept="image/*"
-                                                                        onChange={(e) =>
-                                                                            field.onChange(
-                                                                                e.target.files?.[0]
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </FormControl>
-                                                            </FormItem>
-                                                        )}
-                                                    />
+<FormField
+    control={form.control}
+    name="photoOfBill"
+    render={({ field }) => (
+        <FormItem>
+            <FormLabel>Photo/Bill Document *</FormLabel>
+            <FormControl>
+                <Input
+                    type="file"
+                    accept="image/*,.pdf,application/pdf"
+                    onChange={(e) => field.onChange(e.target.files?.[0])}
+                />
+            </FormControl>
+            {form.formState.errors.photoOfBill && (
+                <p className="text-sm text-red-500">
+                    {form.formState.errors.photoOfBill.message}
+                </p>
+            )}
+            <p className="text-xs text-muted-foreground">
+                Upload image (JPEG, PNG, GIF, WebP) or PDF document
+            </p>
+        </FormItem>
+    )}
+/>
                                                 </>
                                             )}
                                         </>

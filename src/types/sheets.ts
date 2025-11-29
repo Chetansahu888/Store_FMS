@@ -438,6 +438,7 @@ export type StoreInSheet = {
     billRemark: string;
 
     firmNameMatch: string;
+    location: string;
 
 }
 
