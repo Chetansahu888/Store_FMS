@@ -463,7 +463,7 @@ export default () => {
                             {form.formState.isSubmitting && (
                                 <Loader size={20} color="white" aria-label="Loading Spinner" />
                             )}
-                            Create Issue
+                            Store Issue
                         </Button>
                     </div>
                 </form>

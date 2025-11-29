@@ -144,10 +144,23 @@ export default () => {
 
     const schema = z.object({
     status: z.enum(['ok']),
-    billImageStatus: z.instanceof(File).optional().refine((file) => {
-        if (!file) return true;
-        return file.size <= 5 * 1024 * 1024; // 5MB max
-    }, 'File size should be less than 5MB'),
+    billImageStatus: z.instanceof(File).optional()
+        .refine((file) => {
+            if (!file) return true; // Optional field
+            const allowedTypes = [
+                'image/jpeg', 
+                'image/jpg', 
+                'image/png', 
+                'image/gif', 
+                'image/webp',
+                'application/pdf'
+            ];
+            return allowedTypes.includes(file.type);
+        }, 'File must be an image (JPEG, PNG, GIF, WebP) or PDF')
+        .refine((file) => {
+            if (!file) return true;
+            return file.size <= 5 * 1024 * 1024; // 5MB max
+        }, 'File size should be less than 5MB'),
 });
 
     const form = useForm({
@@ -261,18 +274,28 @@ export default () => {
 
         let billImageUrl = '';
         
-        // Upload image if provided
+        // Upload file if provided (both images and PDFs)
         if (values.billImageStatus) {
             console.log('📤 Uploading file...');
+            console.log('📄 File type:', values.billImageStatus.type);
+            console.log('📄 File name:', values.billImageStatus.name);
+            
             try {
                 billImageUrl = await uploadFile({
                     file: values.billImageStatus,
-                    folderId: import.meta.env.VITE_BILL_PHOTO_FOLDER,
+                    folderId: import.meta.env.VITE_BILL_PHOTO_FOLDER || 'bill-documents', // ✅ Use appropriate folder
                 });
                 console.log('✅ File uploaded:', billImageUrl);
+                
+                // Show success message based on file type
+                if (values.billImageStatus.type === 'application/pdf') {
+                    toast.success('PDF document uploaded successfully');
+                } else {
+                    toast.success('Image uploaded successfully');
+                }
             } catch (uploadError) {
                 console.error('❌ File upload error:', uploadError);
-                toast.error('Failed to upload image');
+                toast.error('Failed to upload file. Please try again.');
                 return;
             }
         }
@@ -462,27 +485,36 @@ export default () => {
     />
 
     {form.watch('status') === 'ok' && (
-        <FormField
-            control={form.control}
-            name="billImageStatus"
-            render={({ field: { onChange, value, ...field } }) => (
-                <FormItem>
-                    <FormLabel>Bill Image</FormLabel>
-                    <FormControl>
-                        <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) onChange(file);
-                            }}
-                            {...field}
-                        />
-                    </FormControl>
-                </FormItem>
-            )}
-        />
-    )}
+    <FormField
+        control={form.control}
+        name="billImageStatus"
+        render={({ field: { onChange, value, ...field } }) => (
+            <FormItem>
+                <FormLabel>Bill Image/Document</FormLabel>
+                <FormControl>
+                    <Input
+                        type="file"
+                        accept="image/*,.pdf,application/pdf" // ✅ Accept both images and PDFs
+                        onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) onChange(file);
+                        }}
+                        {...field}
+                    />
+                </FormControl>
+                {/* ✅ Add error message display */}
+                {form.formState.errors.billImageStatus && (
+                    <p className="text-sm text-red-500">
+                        {form.formState.errors.billImageStatus.message}
+                    </p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                    Upload image (JPEG, PNG, GIF, WebP) or PDF document (Max: 5MB)
+                </p>
+            </FormItem>
+        )}
+    />
+)}
 </div>
 
 
